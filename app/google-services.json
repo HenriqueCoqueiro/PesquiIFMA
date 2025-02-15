@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "677416277547",
+    "project_id": "pesquiifma",
+    "storage_bucket": "pesquiifma.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:677416277547:android:c63f86a90c711124c7bc6e",
+        "android_client_info": {
+          "package_name": "com.henrique.pesquiifma"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQxfE3cVKGGUHGQl_EDTpeUXSSJ65BH_0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
