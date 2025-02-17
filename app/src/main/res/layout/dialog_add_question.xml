@@ -1,0 +1,22 @@
+<!-- dialog_add_question.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Campo para escrever a pergunta -->
+    <EditText
+        android:id="@+id/editTextPergunta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite a pergunta"
+        android:inputType="text" />
+
+    <!-- Spinner para selecionar o tipo de resposta -->
+    <Spinner
+        android:id="@+id/spinnerTipoResposta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

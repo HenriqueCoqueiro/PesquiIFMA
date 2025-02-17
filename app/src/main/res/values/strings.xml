@@ -7,4 +7,13 @@
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">Click to register</string>
     <string name="logout">Logout</string>
+        <string-array name="tipos_pergunta">
+            <item>Resposta Aberta</item>
+            <item>Escolha Única</item>
+            <item>Múltipla Escolha</item>
+            <item>Sim/Não</item>
+            <item>Data</item>
+        </string-array>
+
+
 </resources>

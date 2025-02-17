@@ -5,50 +5,29 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Título do formulário -->
     <EditText
         android:id="@+id/editTextTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Título do Formulário" />
+        android:hint="Título" />
 
-    <!-- Descrição do formulário -->
     <EditText
         android:id="@+id/editTextDescricao"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Descrição do Formulário" />
+        android:hint="Descrição" />
 
-    <!-- Campo de pergunta -->
-    <LinearLayout
+    <Button
+        android:id="@+id/buttonAdicionarPergunta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:text="Adicionar Pergunta" />
 
-        <EditText
-            android:id="@+id/editTextPergunta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Digite a pergunta" />
-
-        <Button
-            android:id="@+id/buttonAdicionarPergunta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Adicionar" />
-    </LinearLayout>
-
-    <!-- Lista de perguntas -->
     <ListView
         android:id="@+id/listViewPerguntas"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:layout_height="wrap_content" />
 
-    <!-- Botão de salvar -->
     <Button
         android:id="@+id/buttonSalvar"
         android:layout_width="match_parent"
