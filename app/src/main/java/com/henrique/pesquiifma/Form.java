@@ -7,10 +7,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Form extends AppCompatActivity {
 
@@ -126,7 +130,46 @@ public class Form extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this, "Formulário salvo!", Toast.LENGTH_SHORT).show();
-        finish();
+        // Gerar o link (exemplo simples)
+        String link = "https://example.com/formulario/" + System.currentTimeMillis();
+
+        // Criar a estrutura de perguntas para o formulário
+        ArrayList<Map<String, Object>> perguntasList = new ArrayList<>();
+        for (String pergunta : listaPerguntas) {
+            // Criar um mapa para cada pergunta
+            Map<String, Object> perguntaData = new HashMap<>();
+            perguntaData.put("pergunta", pergunta);
+            perguntaData.put("tipoResposta", "Texto"); // ou "Múltipla Escolha", dependendo de como você definir
+
+            // Adicionar a pergunta na lista
+            perguntasList.add(perguntaData);
+        }
+
+        // Criar o objeto do formulário
+        Map<String, Object> formulario = new HashMap<>();
+        formulario.put("titulo", titulo);
+        formulario.put("descricao", descricao);
+        formulario.put("link", link);
+        formulario.put("perguntas", perguntasList);  // Lista de perguntas dinâmicas
+
+        // Salvar no Firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("formularios")
+                .add(formulario)
+                .addOnSuccessListener(documentReference -> {
+                    // Exibir o link na tela
+                    TextView textViewLink = findViewById(R.id.textViewLink);
+                    textViewLink.setText("Link do formulário: " + link);
+                    textViewLink.setVisibility(View.VISIBLE);  // Torna o link visível
+
+                    Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Erro ao salvar o formulário!", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                });
+
+        // Finaliza a atividade (opcional)
+
     }
 }

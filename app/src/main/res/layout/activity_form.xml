@@ -3,34 +3,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:gravity="center_horizontal">
 
+    <!-- Título do formulário -->
     <EditText
         android:id="@+id/editTextTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Título" />
+        android:hint="Título"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_edittext"/>
 
+    <!-- Descrição do formulário -->
     <EditText
         android:id="@+id/editTextDescricao"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Descrição" />
+        android:hint="Descrição"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_edittext"/>
 
+    <!-- Botão para adicionar pergunta -->
     <Button
         android:id="@+id/buttonAdicionarPergunta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adicionar Pergunta" />
+        android:text="Adicionar Pergunta"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:textColor="@android:color/white"/>
 
+    <!-- Lista de perguntas -->
     <ListView
         android:id="@+id/listViewPerguntas"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
 
+    <!-- Botão para salvar o formulário -->
     <Button
         android:id="@+id/buttonSalvar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Salvar" />
+        android:text="Salvar"
+        android:padding="12dp"
+        android:textColor="@android:color/white"/>
+
+    <!-- Exibição do link -->
+    <TextView
+        android:id="@+id/textViewLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="O link aparecerá aqui!"
+        android:textSize="16sp"
+        android:textColor="#007BFF"
+        android:visibility="gone"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center"
+        android:padding="12dp"
+        android:background="@drawable/rounded_border"
+        android:gravity="center"/>
+
 </LinearLayout>
