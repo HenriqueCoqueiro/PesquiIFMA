@@ -130,46 +130,47 @@ public class Form extends AppCompatActivity {
             return;
         }
 
-        // Gerar o link (exemplo simples)
-        String link = "https://example.com/formulario/" + System.currentTimeMillis();
-
         // Criar a estrutura de perguntas para o formulário
         ArrayList<Map<String, Object>> perguntasList = new ArrayList<>();
         for (String pergunta : listaPerguntas) {
-            // Criar um mapa para cada pergunta
             Map<String, Object> perguntaData = new HashMap<>();
             perguntaData.put("pergunta", pergunta);
-            perguntaData.put("tipoResposta", "Texto"); // ou "Múltipla Escolha", dependendo de como você definir
-
-            // Adicionar a pergunta na lista
+            perguntaData.put("tipoResposta", "Texto"); // Ajuste conforme necessário
             perguntasList.add(perguntaData);
         }
 
-        // Criar o objeto do formulário
-        Map<String, Object> formulario = new HashMap<>();
-        formulario.put("titulo", titulo);
-        formulario.put("descricao", descricao);
-        formulario.put("link", link);
-        formulario.put("perguntas", perguntasList);  // Lista de perguntas dinâmicas
+        // Criar o objeto do formulário sem o link por enquanto
+        Map<String, Object> form = new HashMap<>();
+        form.put("titulo", titulo);
+        form.put("descricao", descricao);
+        form.put("perguntas", perguntasList);
 
-        // Salvar no Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("formularios")
-                .add(formulario)
+                .add(form)
                 .addOnSuccessListener(documentReference -> {
-                    // Exibir o link na tela
-                    TextView textViewLink = findViewById(R.id.textViewLink);
-                    textViewLink.setText("Link do formulário: " + link);
-                    textViewLink.setVisibility(View.VISIBLE);  // Torna o link visível
+                    // Gerar o link usando o ID do documento
+                    String formId = documentReference.getId();
+                    String link = "https://pesqui-ifma.com/form/" + formId;
 
-                    Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                    // Atualizar o documento com o link
+                    documentReference.update("link", link)
+                            .addOnSuccessListener(aVoid -> {
+                                // Exibir o link na tela
+                                TextView textViewLink = findViewById(R.id.textViewLink);
+                                textViewLink.setText("Link do formulário: " + link);
+                                textViewLink.setVisibility(View.VISIBLE);
+
+                                Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Erro ao salvar o link do formulário!", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            });
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Erro ao salvar o formulário!", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 });
-
-        // Finaliza a atividade (opcional)
-
     }
 }

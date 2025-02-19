@@ -3,40 +3,40 @@ package entities;
 import java.util.List;
 
 public class Form {
-    private String titulo;
-    private String descricao;
-    private List<String> perguntas;
+    private String title;
+    private String description;
+    private List<String> questions;
 
     public Form() {
     }
-    public Form(String titulo, String descricao, List<String> perguntas) {
-        this.titulo = titulo;
-        this.descricao = descricao;
-        this.perguntas = perguntas;
+
+    public Form(String title, String description, List<String> questions) {
+        this.title = title;
+        this.description = description;
+        this.questions = questions;
     }
 
-    // Getters e Setters
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public List<String> getPerguntas() {
-        return perguntas;
+    public List<String> getQuestions() {
+        return questions;
     }
 
-    public void setPerguntas(List<String> perguntas) {
-        this.perguntas = perguntas;
+    public void setQuestions(List<String> questions) {
+        this.questions = questions;
     }
 }
