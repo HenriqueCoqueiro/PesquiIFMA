@@ -3,6 +3,7 @@ package com.henrique.pesquiifma;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     FloatingActionButton button;
+    Button myFormsButton;
     FirebaseUser user;
 
     @Override
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.form_button);
+        myFormsButton = findViewById(R.id.my_forms_button);
         user = auth.getCurrentUser();
 
         if (user == null){
@@ -31,12 +34,19 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
+        myFormsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MyForms.class);
+                startActivity(intent);
+            }
+        });
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), Form.class);
                 startActivity(intent);
-                finish();
             }
         });
 

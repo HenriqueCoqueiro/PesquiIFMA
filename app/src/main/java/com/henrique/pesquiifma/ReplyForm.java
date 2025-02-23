@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,8 @@ public class ReplyForm extends AppCompatActivity {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         List<Map<String, Object>> questions = (List<Map<String, Object>>) documentSnapshot.get("perguntas");
+                        String uid = documentSnapshot.getString("uid"); // Recuperar o UID do formulário
+
                         if (questions != null) {
                             for (Map<String, Object> questionMap : questions) {
                                 String questionTextStr = (String) questionMap.get("pergunta");
@@ -85,7 +86,7 @@ public class ReplyForm extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("respostas")
                 .document(formId) // Use o formId para salvar as respostas associadas ao formulário
-                .set(new ResponseWrapper(answers))
+                .set(new ResponseWrapper(answers, formId)) // Adicionando o UID ao wrapper
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Respostas enviadas com sucesso!", Toast.LENGTH_SHORT).show();
                 })
@@ -97,11 +98,14 @@ public class ReplyForm extends AppCompatActivity {
     // Classe auxiliar para salvar as respostas no Firestore
     public static class ResponseWrapper {
         public List<String> respostas;
+        public String formId; // Incluindo o formId (UID) nas respostas
 
         public ResponseWrapper() {}
 
-        public ResponseWrapper(List<String> respostas) {
+        public ResponseWrapper(List<String> respostas, String formId) {
             this.respostas = respostas;
+            this.formId = formId; // Inicializando o UID no ResponseWrapper
         }
     }
+
 }

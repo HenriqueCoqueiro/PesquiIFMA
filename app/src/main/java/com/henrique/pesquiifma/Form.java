@@ -11,6 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -139,11 +142,16 @@ public class Form extends AppCompatActivity {
             perguntasList.add(perguntaData);
         }
 
-        // Criar o objeto do formulário sem o link por enquanto
+        // Obter o UID do usuário atual
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user != null ? user.getUid() : "";
+
+        // Criar o objeto do formulário com o UID
         Map<String, Object> form = new HashMap<>();
         form.put("titulo", titulo);
         form.put("descricao", descricao);
         form.put("perguntas", perguntasList);
+        form.put("uid", uid); // Adiciona o UID
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("formularios")
@@ -173,4 +181,5 @@ public class Form extends AppCompatActivity {
                     e.printStackTrace();
                 });
     }
+
 }
