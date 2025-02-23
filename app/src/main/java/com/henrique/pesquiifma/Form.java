@@ -27,6 +27,7 @@ public class Form extends AppCompatActivity {
     ArrayList<String> listaPerguntas;
     ArrayAdapter<String> adapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

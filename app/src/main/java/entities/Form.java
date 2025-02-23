@@ -18,6 +18,11 @@ public class Form {
         this.uid = uid;
     }
 
+    public Form(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
     public String getTitle() {
         return title;
     }
