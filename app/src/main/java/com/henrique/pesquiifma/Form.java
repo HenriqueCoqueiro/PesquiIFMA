@@ -158,12 +158,17 @@ public class Form extends AppCompatActivity {
         db.collection("formularios")
                 .add(form)
                 .addOnSuccessListener(documentReference -> {
-                    // Gerar o link usando o ID do documento
+                    // Gerar o formId usando o ID do documento
                     String formId = documentReference.getId();
                     String link = "https://pesqui-ifma.com/form/" + formId;
 
-                    // Atualizar o documento com o link
-                    documentReference.update("link", link)
+                    // Atualizar o documento com o formId e o link
+                    Map<String, Object> updateMap = new HashMap<>();
+                    updateMap.put("formId", formId); // Atualizando o formId
+                    updateMap.put("link", link); // Atualizando o link
+
+                    // Atualizar o documento
+                    documentReference.update(updateMap)
                             .addOnSuccessListener(aVoid -> {
                                 // Exibir o link na tela
                                 TextView textViewLink = findViewById(R.id.textViewLink);
@@ -182,5 +187,6 @@ public class Form extends AppCompatActivity {
                     e.printStackTrace();
                 });
     }
+
 
 }

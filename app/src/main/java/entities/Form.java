@@ -3,6 +3,7 @@ package entities;
 import java.util.List;
 
 public class Form {
+    private String formId; // Novo campo para armazenar o ID do formulário
     private String title;
     private String description;
     private List<String> questions;
@@ -11,7 +12,8 @@ public class Form {
     public Form() {
     }
 
-    public Form(String title, String description, List<String> questions, String uid) {
+    public Form(String formId, String title, String description, List<String> questions, String uid) {
+        this.formId = formId; // Inicializa o formId
         this.title = title;
         this.description = description;
         this.questions = questions;
@@ -21,6 +23,14 @@ public class Form {
     public Form(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    public String getFormId() {
+        return formId; // Método getter para o ID do formulário
+    }
+
+    public void setFormId(String formId) {
+        this.formId = formId; // Método setter para o ID do formulário
     }
 
     public String getTitle() {
@@ -48,10 +58,10 @@ public class Form {
     }
 
     public String getUid() {
-        return uid; // Método getter para o UID
+        return uid;
     }
 
     public void setUid(String uid) {
-        this.uid = uid; // Método setter para o UID
+        this.uid = uid;
     }
 }
