@@ -18,7 +18,8 @@ public class ReplyForm extends AppCompatActivity {
     private LinearLayout questionsContainer;
     private Button submitButton;
     private List<EditText> answerFields;
-    private String formId;
+    private String formId; // Aqui é o formId passado pela URL
+    private String uid; // Este será o UID do documento no Firestore
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class ReplyForm extends AppCompatActivity {
         // Captura o link que abriu o app
         Uri data = getIntent().getData();
         if (data != null) {
-            formId = data.getLastPathSegment(); // Pega o ID do formulário da URL
+            formId = data.getLastPathSegment(); // Pega o formId (ID do formulário) da URL
             Log.d("ReplyForm", "Link recebido: " + data.toString());  // Verificar o link
             carregarFormulario(formId); // Buscar as perguntas no Firestore
         } else {
@@ -43,7 +44,7 @@ public class ReplyForm extends AppCompatActivity {
     }
 
     private void carregarFormulario(String formId) {
-        // Buscar o formulário do Firestore usando o formId
+        // Buscar o formulário do Firestore usando o formId (ID do formulário)
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("formularios")
                 .document(formId)
@@ -51,7 +52,7 @@ public class ReplyForm extends AppCompatActivity {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         List<Map<String, Object>> questions = (List<Map<String, Object>>) documentSnapshot.get("perguntas");
-                        String uid = documentSnapshot.getString("uid"); // Recuperar o UID do formulário
+                        uid = documentSnapshot.getString("uid"); // Recuperar o UID do formulário
 
                         if (questions != null) {
                             for (Map<String, Object> questionMap : questions) {
@@ -85,8 +86,8 @@ public class ReplyForm extends AppCompatActivity {
         // Salvar as respostas no Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("respostas")
-                .document(formId) // Use o formId para salvar as respostas associadas ao formulário
-                .set(new ResponseWrapper(answers, formId)) // Adicionando o UID ao wrapper
+                .document(formId) // Usando o formId para salvar as respostas associadas ao formulário
+                .set(new ResponseWrapper(answers, formId, uid)) // Passando o formId (ID do formulário) e o uid
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Respostas enviadas com sucesso!", Toast.LENGTH_SHORT).show();
                 })
@@ -98,14 +99,15 @@ public class ReplyForm extends AppCompatActivity {
     // Classe auxiliar para salvar as respostas no Firestore
     public static class ResponseWrapper {
         public List<String> respostas;
-        public String formId; // Incluindo o formId (UID) nas respostas
+        public String formId; // ID do formulário
+        public String uid; // UID do formulário no Firestore
 
         public ResponseWrapper() {}
 
-        public ResponseWrapper(List<String> respostas, String formId) {
+        public ResponseWrapper(List<String> respostas, String formId, String uid) {
             this.respostas = respostas;
-            this.formId = formId; // Inicializando o UID no ResponseWrapper
+            this.formId = formId; // Inicializando com o formId
+            this.uid = uid; // Inicializando com o UID do Firestore
         }
     }
-
 }
