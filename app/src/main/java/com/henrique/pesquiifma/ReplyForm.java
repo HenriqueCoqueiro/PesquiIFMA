@@ -87,7 +87,8 @@ public class ReplyForm extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("respostas")
                 .document(formId) // Usando o formId para salvar as respostas associadas ao formulário
-                .set(new ResponseWrapper(answers, formId, uid)) // Passando o formId (ID do formulário) e o uid
+                .collection("respostas") // Adicionando uma subcoleção para respostas individuais
+                .add(new ResponseWrapper(answers, formId, uid)) // Criar um novo documento de resposta
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Respostas enviadas com sucesso!", Toast.LENGTH_SHORT).show();
                 })
@@ -95,6 +96,7 @@ public class ReplyForm extends AppCompatActivity {
                     Toast.makeText(this, "Erro ao enviar as respostas!", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     // Classe auxiliar para salvar as respostas no Firestore
     public static class ResponseWrapper {
