@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".RespostasActivity"
+            android:exported="false" />
+        <activity
             android:name=".MyForms"
             android:exported="false" />
         <activity
@@ -30,7 +33,7 @@
                 <data
                     android:host="pesqui-ifma.com"
                     android:pathPrefix="/form/"
-                    android:scheme="https"></data>
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity

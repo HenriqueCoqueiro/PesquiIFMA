@@ -12,9 +12,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
+
 import entities.Form;
-
-
 import adapters.FormAdapter;
 
 public class MyForms extends AppCompatActivity {
@@ -31,7 +30,7 @@ public class MyForms extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         formList = new ArrayList<>();
-        adapter = new FormAdapter(formList);
+        adapter = new FormAdapter(formList, MyForms.this);
         recyclerView.setAdapter(adapter);
 
         carregarFormulariosDoUsuario();
@@ -46,17 +45,6 @@ public class MyForms extends AppCompatActivity {
 
         String userId = user.getUid(); // Pega o ID do usuário logado
 
-        // Inicializando a lista de formulários
-        if (formList == null) {
-            formList = new ArrayList<>();
-        }
-
-        // Inicializando o adapter se ainda não foi feito
-        if (adapter == null) {
-            adapter = new FormAdapter(formList);
-            recyclerView.setAdapter(adapter);
-        }
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("formularios")
                 .whereEqualTo("uid", userId) // Filtra pelos formulários do usuário
@@ -65,9 +53,13 @@ public class MyForms extends AppCompatActivity {
                     formList.clear(); // Limpa a lista antes de adicionar novos formulários
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        // Recuperando os dados do formulário
+                        String formId = document.getId(); // Obtém o ID do formulário
                         String titulo = document.getString("titulo");
                         String descricao = document.getString("descricao");
-                        formList.add(new Form(titulo, descricao));
+
+                        // Criando o objeto Form com o formId
+                        formList.add(new Form(formId, titulo, descricao, null, userId));
                     }
 
                     // Notifica o adapter que a lista foi atualizada
@@ -77,5 +69,4 @@ public class MyForms extends AppCompatActivity {
                     Toast.makeText(this, "Erro ao carregar os formulários!", Toast.LENGTH_SHORT).show();
                 });
     }
-
 }
