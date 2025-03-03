@@ -4,6 +4,38 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- Filtro para selecionar entre respostas "Sim" e "Não" -->
+    <LinearLayout
+        android:id="@+id/linearLayoutFiltro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- CheckBox para "Sim" -->
+        <CheckBox
+            android:id="@+id/checkSim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sim" />
+
+        <!-- CheckBox para "Não" -->
+        <CheckBox
+            android:id="@+id/checkNao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Não" />
+    </LinearLayout>
+
+
+    <!-- Gráfico de respostas -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Exibe as respostas -->
     <TextView
         android:id="@+id/respostasTextView"
         android:layout_width="match_parent"
