@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.henrique.pesquiifma.R;
-import com.henrique.pesquiifma.RespostasActivity; // Importa a RespostasActivity
+import com.henrique.pesquiifma.ViewResponses; // Importa a RespostasActivity
 import java.util.List;
 import entities.Form;
 
@@ -37,7 +37,7 @@ public class FormAdapter extends RecyclerView.Adapter<FormAdapter.FormViewHolder
         // Adiciona o OnClickListener para navegar até a RespostasActivity
         holder.itemView.setOnClickListener(v -> {
             // Passa o formId para a RespostasActivity
-            Intent intent = new Intent(context, RespostasActivity.class);
+            Intent intent = new Intent(context, ViewResponses.class);
             intent.putExtra("formId", form.getFormId()); // Passa o formId
             context.startActivity(intent);
         });

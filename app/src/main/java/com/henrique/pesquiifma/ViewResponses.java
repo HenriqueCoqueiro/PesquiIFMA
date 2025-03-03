@@ -10,14 +10,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RespostasActivity extends AppCompatActivity {
+public class ViewResponses extends AppCompatActivity {
     private List<String> respostasList;
     private TextView respostasTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_respostas);
+        setContentView(R.layout.activity_responses);
 
         respostasTextView = findViewById(R.id.respostasTextView);
 
