@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Form"
+            android:name=".CreatForm"
             android:exported="false" />
         <activity
             android:name=".Register"

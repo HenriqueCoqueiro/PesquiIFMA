@@ -65,6 +65,8 @@
         android:layout_gravity="center"
         android:padding="12dp"
         android:background="@drawable/rounded_border"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:autoLink="web" />
+
 
 </LinearLayout>

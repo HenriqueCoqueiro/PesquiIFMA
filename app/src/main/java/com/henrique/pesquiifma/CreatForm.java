@@ -1,5 +1,7 @@
 package com.henrique.pesquiifma;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -19,14 +21,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Form extends AppCompatActivity {
+public class CreatForm extends AppCompatActivity {
 
     EditText editTextTitulo, editTextDescricao;
     Button buttonAdicionarPergunta, buttonSalvar;
     ListView listViewPerguntas;
     ArrayList<String> listaPerguntas;
     ArrayAdapter<String> adapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,7 @@ public class Form extends AppCompatActivity {
             String tipoResposta = spinnerTipoResposta.getSelectedItem().toString();
 
             if (pergunta.isEmpty()) {
-                Toast.makeText(Form.this, "Digite uma pergunta!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatForm.this, "Digite uma pergunta!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -117,7 +118,7 @@ public class Form extends AppCompatActivity {
                 listaPerguntas.add(perguntaComOpcoes);
                 adapter.notifyDataSetChanged();
             } else {
-                Toast.makeText(Form.this, "Adicione pelo menos uma opção!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatForm.this, "Adicione pelo menos uma opção!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -175,6 +176,12 @@ public class Form extends AppCompatActivity {
                                 textViewLink.setText("Link do formulário: " + link);
                                 textViewLink.setVisibility(View.VISIBLE);
 
+                                // Tornar o link clicável
+                                textViewLink.setOnClickListener(v -> {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                                    startActivity(intent);
+                                });
+
                                 Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
                             })
                             .addOnFailureListener(e -> {
@@ -187,6 +194,4 @@ public class Form extends AppCompatActivity {
                     e.printStackTrace();
                 });
     }
-
-
 }
