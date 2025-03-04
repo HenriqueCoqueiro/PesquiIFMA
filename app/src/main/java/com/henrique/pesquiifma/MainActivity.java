@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     FloatingActionButton button;
+    Button logoutButton;
     Button myFormsButton;
     FirebaseUser user;
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         auth = FirebaseAuth.getInstance();
+        logoutButton = findViewById(R.id.logout_button);
         button = findViewById(R.id.form_button);
         myFormsButton = findViewById(R.id.my_forms_button);
         user = auth.getCurrentUser();
@@ -33,6 +35,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         myFormsButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -6,5 +6,6 @@
     <color name="roxo">#C36DF0</color>
         <color name="simColor">#4CAF50</color>  <!-- Verde para "Sim" -->
         <color name="naoColor">#F44336</color>  <!-- Vermelho para "Não" -->
+    <color name="soft_red">#D43F52</color>
 
 </resources>

@@ -48,7 +48,6 @@
     <Button
         android:id="@+id/login_button"
         android:text="@string/login"
-        android:backgroundTint="@color/verde"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
