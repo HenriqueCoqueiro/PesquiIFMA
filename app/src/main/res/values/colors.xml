@@ -3,9 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="verde">#20EB5A</color>
-    <color name="roxo">#C36DF0</color>
+    <color name="roxo">#967EDC</color>
         <color name="simColor">#4CAF50</color>  <!-- Verde para "Sim" -->
         <color name="naoColor">#F44336</color>  <!-- Vermelho para "Não" -->
-    <color name="soft_red">#D43F52</color>
+    <color name="soft_red">#DE4B5E</color>
 
 </resources>
