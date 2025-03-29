@@ -1,5 +1,6 @@
 package com.henrique.pesquiifma;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
@@ -25,6 +26,18 @@ public class ViewResponses extends AppCompatActivity {
 
     private List<String> respostasList;
     private TextView respostasTextView;
+
+    // Definir um conjunto de cores mais estéticas
+    private static final int[] ESTHETIC_COLORS = {
+            Color.parseColor("#FFB6B9"),  // Light Pink
+            Color.parseColor("#FF677D"),  // Muted Pink
+            Color.parseColor("#D4A5A5"),  // Light Red
+            Color.parseColor("#392F5A"),  // Dark Purple
+            Color.parseColor("#1D2D50"),  // Navy Blue
+            Color.parseColor("#61C0BF"),  // Teal
+            Color.parseColor("#6B4226"),  // Warm Brown
+            Color.parseColor("#D9BF77")   // Gold
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,8 +158,8 @@ public class ViewResponses extends AppCompatActivity {
         // Criação do dataset para o gráfico
         PieDataSet dataSet = new PieDataSet(entries, "Respostas para " + perguntaId);
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.simColor)); // Cor para "Sim"
-        colors.add(getResources().getColor(R.color.naoColor)); // Cor para "Não"
+        colors.add(ESTHETIC_COLORS[0]); // Cor para "Sim"
+        colors.add(ESTHETIC_COLORS[1]); // Cor para "Não"
         dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
@@ -173,9 +186,10 @@ public class ViewResponses extends AppCompatActivity {
         // Criação do dataset para o gráfico
         PieDataSet dataSet = new PieDataSet(entries, "Respostas para " + perguntaId);
         ArrayList<Integer> colors = new ArrayList<>();
-        // Adicione cores dinâmicas ou fixas conforme necessário
+
+        // Adiciona cores estéticas para cada entrada de resposta
         for (int i = 0; i < entries.size(); i++) {
-            colors.add(getResources().getColor(R.color.colorAccent)); // Usando uma cor para todos por enquanto
+            colors.add(ESTHETIC_COLORS[i % ESTHETIC_COLORS.length]);  // Usa cores do conjunto estético
         }
         dataSet.setColors(colors);
 
