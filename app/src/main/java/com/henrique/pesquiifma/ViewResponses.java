@@ -84,7 +84,7 @@ public class ViewResponses extends AppCompatActivity {
     }
 
     private void exibirGraficos() {
-        // Cria um mapa para armazenar a contagem de "Sim" e "Não" por pergunta
+        // Cria um mapa para armazenar a contagem de respostas por pergunta
         Map<String, Map<String, Integer>> respostasPorPergunta = new HashMap<>();
 
         // Processa as respostas
@@ -101,7 +101,7 @@ public class ViewResponses extends AppCompatActivity {
 
                 Map<String, Integer> contagemRespostas = respostasPorPergunta.get(perguntaId);
 
-                // Conta as respostas "Sim" e "Não"
+                // Conta as respostas para cada valor
                 contagemRespostas.put(respostaValor, contagemRespostas.getOrDefault(respostaValor, 0) + 1);
             }
         }
@@ -110,11 +110,17 @@ public class ViewResponses extends AppCompatActivity {
         int index = 0;  // Para adicionar múltiplos gráficos em vez de um único
         for (String perguntaId : respostasPorPergunta.keySet()) {
             Map<String, Integer> contagemRespostas = respostasPorPergunta.get(perguntaId);
-            int simCount = contagemRespostas.getOrDefault("Sim", 0);
-            int naoCount = contagemRespostas.getOrDefault("Não", 0);
 
-            // Gerar um novo gráfico para cada pergunta
-            criarGrafico(simCount, naoCount, perguntaId, index);
+            // Verifica se a pergunta é de múltipla escolha (não apenas "Sim" ou "Não")
+            if (contagemRespostas.size() > 2) {
+                // Gerar gráfico de múltipla escolha
+                criarGraficoMultiplaEscolha(contagemRespostas, perguntaId, index);
+            } else {
+                // Gerar gráfico para respostas "Sim" ou "Não"
+                int simCount = contagemRespostas.getOrDefault("Sim", 0);
+                int naoCount = contagemRespostas.getOrDefault("Não", 0);
+                criarGrafico(simCount, naoCount, perguntaId, index);
+            }
             index++;
         }
     }
@@ -141,6 +147,36 @@ public class ViewResponses extends AppCompatActivity {
         ArrayList<Integer> colors = new ArrayList<>();
         colors.add(getResources().getColor(R.color.simColor)); // Cor para "Sim"
         colors.add(getResources().getColor(R.color.naoColor)); // Cor para "Não"
+        dataSet.setColors(colors);
+
+        PieData data = new PieData(dataSet);
+        pieChart.setData(data);
+        pieChart.invalidate(); // Atualiza o gráfico
+    }
+
+    private void criarGraficoMultiplaEscolha(Map<String, Integer> contagemRespostas, String perguntaId, int index) {
+        // Criação do gráfico
+        PieChart pieChart = new PieChart(this);
+        pieChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+        LinearLayout linearLayout = findViewById(R.id.linearLayoutGrafico);
+        linearLayout.addView(pieChart);
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        // Adiciona entradas para cada opção de resposta de múltipla escolha
+        for (Map.Entry<String, Integer> entry : contagemRespostas.entrySet()) {
+            String resposta = entry.getKey();
+            int count = entry.getValue();
+            entries.add(new PieEntry(count, resposta));
+        }
+
+        // Criação do dataset para o gráfico
+        PieDataSet dataSet = new PieDataSet(entries, "Respostas para " + perguntaId);
+        ArrayList<Integer> colors = new ArrayList<>();
+        // Adicione cores dinâmicas ou fixas conforme necessário
+        for (int i = 0; i < entries.size(); i++) {
+            colors.add(getResources().getColor(R.color.colorAccent)); // Usando uma cor para todos por enquanto
+        }
         dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
