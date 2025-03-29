@@ -53,7 +53,7 @@ public class ViewResponses extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Buscar as respostas na subcoleção "respostas" usando o formId
-        db.collection("respostas")  // A coleção onde as respostas estão armazenadas
+        db.collection("formularios")  // A coleção onde as respostas estão armazenadas
                 .document(formId)    // Usando o formId como documento para as respostas desse formulário
                 .collection("respostas") // Subcoleção onde as respostas individuais estão
                 .get()
