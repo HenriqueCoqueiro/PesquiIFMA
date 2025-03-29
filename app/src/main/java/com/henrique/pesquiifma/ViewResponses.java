@@ -2,7 +2,6 @@ package com.henrique.pesquiifma;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +25,6 @@ public class ViewResponses extends AppCompatActivity {
 
     private List<String> respostasList;
     private TextView respostasTextView;
-    private CheckBox checkSim, checkNao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +32,6 @@ public class ViewResponses extends AppCompatActivity {
         setContentView(R.layout.activity_responses);
 
         respostasTextView = findViewById(R.id.respostasTextView);
-        checkSim = findViewById(R.id.checkSim);
-        checkNao = findViewById(R.id.checkNao);
 
         // Pega o formId passado da activity anterior
         String formId = getIntent().getStringExtra("formId");
@@ -48,10 +44,6 @@ public class ViewResponses extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Erro: Formulário não encontrado!", Toast.LENGTH_SHORT).show();
         }
-
-        // Adiciona listeners aos CheckBoxes
-        checkSim.setOnCheckedChangeListener((buttonView, isChecked) -> filtrarRespostas());
-        checkNao.setOnCheckedChangeListener((buttonView, isChecked) -> filtrarRespostas());
     }
 
     private void carregarRespostas(String formId) {
@@ -81,7 +73,7 @@ public class ViewResponses extends AppCompatActivity {
                             respostasText.append(resposta).append("\n");
                         }
                         respostasTextView.setText(respostasText.toString());
-                        filtrarRespostas();  // Mostrar as respostas com base nos filtros
+                        exibirGraficos();  // Exibir gráficos para todas as respostas
                     } else {
                         respostasTextView.setText("Nenhuma resposta encontrada.");
                     }
@@ -91,7 +83,7 @@ public class ViewResponses extends AppCompatActivity {
                 });
     }
 
-    private void filtrarRespostas() {
+    private void exibirGraficos() {
         // Cria um mapa para armazenar a contagem de "Sim" e "Não" por pergunta
         Map<String, Map<String, Integer>> respostasPorPergunta = new HashMap<>();
 
