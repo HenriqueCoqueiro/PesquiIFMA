@@ -3,23 +3,29 @@ package com.henrique.pesquiifma;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ViewResponses extends AppCompatActivity {
 
     private List<String> respostasList;
     private TextView respostasTextView;
-    private PieChart pieChart;
     private CheckBox checkSim, checkNao;
 
     @Override
@@ -28,7 +34,6 @@ public class ViewResponses extends AppCompatActivity {
         setContentView(R.layout.activity_responses);
 
         respostasTextView = findViewById(R.id.respostasTextView);
-        pieChart = findViewById(R.id.pieChart);
         checkSim = findViewById(R.id.checkSim);
         checkNao = findViewById(R.id.checkNao);
 
@@ -53,18 +58,20 @@ public class ViewResponses extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Buscar as respostas na subcoleção "respostas" usando o formId
-        db.collection("formularios")  // A coleção onde as respostas estão armazenadas
-                .document(formId)    // Usando o formId como documento para as respostas desse formulário
-                .collection("respostas") // Subcoleção onde as respostas individuais estão
+        db.collection("formularios")
+                .document(formId)
+                .collection("respostas")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     respostasList = new ArrayList<>();
 
-                    // Processa as respostas
+                    // Processa as respostas associadas à pergunta
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        List<String> respostas = (List<String>) document.get("respostas");
-                        if (respostas != null) {
-                            respostasList.addAll(respostas);  // Adiciona todas as respostas
+                        String perguntaId = document.getString("perguntaId");
+                        String resposta = document.getString("resposta");
+
+                        if (perguntaId != null && resposta != null) {
+                            respostasList.add(perguntaId + ":" + resposta); // Combine perguntaId e resposta
                         }
                     }
 
@@ -85,48 +92,48 @@ public class ViewResponses extends AppCompatActivity {
     }
 
     private void filtrarRespostas() {
-        List<String> respostasFiltradas = new ArrayList<>();
+        // Cria um mapa para armazenar a contagem de "Sim" e "Não" por pergunta
+        Map<String, Map<String, Integer>> respostasPorPergunta = new HashMap<>();
 
-        // Verifica se o filtro "Sim" está selecionado
-        if (checkSim.isChecked()) {
-            for (String resposta : respostasList) {
-                if (resposta.equals("Sim")) {
-                    respostasFiltradas.add(resposta);
+        // Processa as respostas
+        for (String resposta : respostasList) {
+            String[] partes = resposta.split(":");  // Separar perguntaId e resposta
+            if (partes.length == 2) {
+                String perguntaId = partes[0];
+                String respostaValor = partes[1];
+
+                // Inicializa o mapa de respostas para a pergunta se necessário
+                if (!respostasPorPergunta.containsKey(perguntaId)) {
+                    respostasPorPergunta.put(perguntaId, new HashMap<>());
                 }
+
+                Map<String, Integer> contagemRespostas = respostasPorPergunta.get(perguntaId);
+
+                // Conta as respostas "Sim" e "Não"
+                contagemRespostas.put(respostaValor, contagemRespostas.getOrDefault(respostaValor, 0) + 1);
             }
         }
 
-        // Verifica se o filtro "Não" está selecionado
-        if (checkNao.isChecked()) {
-            for (String resposta : respostasList) {
-                if (resposta.equals("Não")) {
-                    respostasFiltradas.add(resposta);
-                }
-            }
-        }
+        // Para cada pergunta, gerar o gráfico com base nas respostas
+        int index = 0;  // Para adicionar múltiplos gráficos em vez de um único
+        for (String perguntaId : respostasPorPergunta.keySet()) {
+            Map<String, Integer> contagemRespostas = respostasPorPergunta.get(perguntaId);
+            int simCount = contagemRespostas.getOrDefault("Sim", 0);
+            int naoCount = contagemRespostas.getOrDefault("Não", 0);
 
-        // Se nenhum filtro for selecionado, mostra todas as respostas
-        if (!checkSim.isChecked() && !checkNao.isChecked()) {
-            respostasFiltradas.addAll(respostasList);
+            // Gerar um novo gráfico para cada pergunta
+            criarGrafico(simCount, naoCount, perguntaId, index);
+            index++;
         }
-
-        // Atualiza o gráfico com as respostas filtradas
-        atualizarGrafico(respostasFiltradas);
     }
 
-    private void atualizarGrafico(List<String> respostasFiltradas) {
-        int simCount = 0, naoCount = 0;
+    private void criarGrafico(int simCount, int naoCount, String perguntaId, int index) {
+        // Criação do gráfico
+        PieChart pieChart = new PieChart(this);
+        pieChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+        LinearLayout linearLayout = findViewById(R.id.linearLayoutGrafico);
+        linearLayout.addView(pieChart);
 
-        // Contagem de respostas "Sim" e "Não"
-        for (String resposta : respostasFiltradas) {
-            if (resposta.equals("Sim")) {
-                simCount++;
-            } else if (resposta.equals("Não")) {
-                naoCount++;
-            }
-        }
-
-        // Criação das entradas para o gráfico
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         // Adiciona entradas para "Sim" e "Não" se houverem respostas
@@ -137,20 +144,12 @@ public class ViewResponses extends AppCompatActivity {
             entries.add(new PieEntry(naoCount, "Não"));
         }
 
-        // Se não houver respostas para "Sim" ou "Não", mostra "Nenhuma resposta"
-        if (entries.isEmpty()) {
-            entries.add(new PieEntry(1, "Nenhuma resposta"));
-        }
-
-        // Criação do dataset para o gráfico com cores diferentes para "Sim" e "Não"
-        PieDataSet dataSet = new PieDataSet(entries, "Respostas");
+        // Criação do dataset para o gráfico
+        PieDataSet dataSet = new PieDataSet(entries, "Respostas para " + perguntaId);
         ArrayList<Integer> colors = new ArrayList<>();
-
-        // Adiciona cores para "Sim" e "Não"
         colors.add(getResources().getColor(R.color.simColor)); // Cor para "Sim"
         colors.add(getResources().getColor(R.color.naoColor)); // Cor para "Não"
-
-        dataSet.setColors(colors);  // Define as cores para o gráfico
+        dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
         pieChart.setData(data);

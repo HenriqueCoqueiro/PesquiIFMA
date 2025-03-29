@@ -62,10 +62,11 @@ public class ReplyForm extends AppCompatActivity {
                         if (questions != null) {
                             for (Map<String, Object> questionMap : questions) {
                                 String questionTextStr = (String) questionMap.get("pergunta");
+                                String questionId = (String) questionMap.get("id"); // Obtém o id da pergunta
 
                                 // Verifica se a pergunta é do tipo "Sim/Não"
                                 if (questionTextStr.contains("Sim/Não")) {
-                                    createYesNoQuestion(questionTextStr);
+                                    createYesNoQuestion(questionTextStr, questionId);
                                 }
                                 // Verifica se a pergunta é do tipo "Múltipla Escolha"
                                 else if (questionTextStr.contains("Múltipla Escolha")) {
@@ -77,10 +78,10 @@ public class ReplyForm extends AppCompatActivity {
                                     List<String> optionsList = Arrays.asList(optionsString.split(",\\s*"));  // Divide e remove os espaços
 
                                     // Agora passamos a lista de opções para o método de criação da pergunta
-                                    createMultipleChoiceQuestion(questionTextStr, optionsList);
+                                    createMultipleChoiceQuestion(questionTextStr, optionsList, questionId);
                                 }
                                 else {
-                                    createTextQuestion(questionTextStr);
+                                    createTextQuestion(questionTextStr, questionId);
                                 }
                             }
                         }
@@ -94,7 +95,7 @@ public class ReplyForm extends AppCompatActivity {
                 });
     }
 
-    private void createYesNoQuestion(String questionText) {
+    private void createYesNoQuestion(String questionText, String questionId) {
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
         questionsContainer.addView(questionTextView);
@@ -114,7 +115,7 @@ public class ReplyForm extends AppCompatActivity {
         radioGroups.add(radioGroup); // Adiciona o RadioGroup à lista
     }
 
-    private void createMultipleChoiceQuestion(String questionText, List<String> options) {
+    private void createMultipleChoiceQuestion(String questionText, List<String> options, String questionId) {
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
         questionsContainer.addView(questionTextView);
@@ -132,7 +133,7 @@ public class ReplyForm extends AppCompatActivity {
         radioGroups.add(radioGroup); // Adiciona o RadioGroup à lista
     }
 
-    private void createTextQuestion(String questionText) {
+    private void createTextQuestion(String questionText, String questionId) {
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
         questionsContainer.addView(questionTextView);
@@ -143,63 +144,56 @@ public class ReplyForm extends AppCompatActivity {
     }
 
     private void submitResponses() {
-        List<String> answers = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Coleta as respostas dos EditTexts
-        for (EditText field : answerFields) {
+        for (int i = 0; i < answerFields.size(); i++) {
+            EditText field = answerFields.get(i);
             String answer = field.getText().toString();
-            answers.add(answer);
-            Log.d("Resposta", "Resposta de EditText: " + answer);
+            String questionId = "pergunta_" + (i + 1); // Gerar ID da pergunta, ou use o que foi recuperado no carregarFormulario
+            saveAnswer(questionId, answer);
         }
 
         // Coleta as respostas dos RadioGroups
-        for (RadioGroup group : radioGroups) {
+        for (int i = 0; i < radioGroups.size(); i++) {
+            RadioGroup group = radioGroups.get(i);
             int selectedId = group.getCheckedRadioButtonId();
+            String answer = "";
             if (selectedId != -1) {
                 RadioButton selectedRadioButton = findViewById(selectedId);
-                String answer = selectedRadioButton.getText().toString();
-                answers.add(answer);
-                Log.d("Resposta", "Resposta de RadioGroup: " + answer);
-            } else {
-                answers.add("");  // Ou algum valor default caso nenhum botão seja selecionado
-                Log.d("Resposta", "Nenhuma resposta selecionada para RadioGroup.");
+                answer = selectedRadioButton.getText().toString();
             }
+            String questionId = "pergunta_" + (i + 1); // Gerar ID da pergunta, ou use o que foi recuperado no carregarFormulario
+            saveAnswer(questionId, answer);
         }
+    }
 
-        // Verifique se as respostas foram corretamente coletadas
-        Log.d("Resposta", "Respostas coletadas: " + answers.toString());
-
-        // Salvar as respostas no Firestore
+    private void saveAnswer(String questionId, String answer) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Salvando as respostas na subcoleção 'respostas' do formulário
+        // Salvando as respostas na subcoleção 'respostas'
         db.collection("formularios")  // Coleção 'formularios'
                 .document(formId)  // Documento do formulário com formId
                 .collection("respostas")  // Subcoleção 'respostas'
-                .add(new ResponseWrapper(answers, formId, uid))  // Adicionar um novo documento de resposta
+                .add(new AnswerWrapper(questionId, answer))  // Adicionar um novo documento de resposta
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Respostas enviadas com sucesso!", Toast.LENGTH_SHORT).show();
+                    Log.d("Resposta", "Resposta salva com sucesso!");
                 })
                 .addOnFailureListener(e -> {
-                    Log.d("Resposta", "Erro ao enviar as respostas: " + e.getMessage());
-                    Toast.makeText(this, "Erro ao enviar as respostas!", Toast.LENGTH_SHORT).show();
+                    Log.d("Resposta", "Erro ao salvar a resposta: " + e.getMessage());
                 });
     }
 
-
-
     // Classe auxiliar para salvar as respostas no Firestore
-    public static class ResponseWrapper {
-        public List<String> respostas;
-        public String formId; // ID do formulário
-        public String uid; // UID do formulário no Firestore
+    public static class AnswerWrapper {
+        public String perguntaId; // ID da pergunta
+        public String resposta; // Resposta
 
-        public ResponseWrapper() {}
+        public AnswerWrapper() {}
 
-        public ResponseWrapper(List<String> respostas, String formId, String uid) {
-            this.respostas = respostas;
-            this.formId = formId; // Inicializando com o formId
-            this.uid = uid; // Inicializando com o UID do Firestore
+        public AnswerWrapper(String perguntaId, String resposta) {
+            this.perguntaId = perguntaId;
+            this.resposta = resposta;
         }
     }
 }

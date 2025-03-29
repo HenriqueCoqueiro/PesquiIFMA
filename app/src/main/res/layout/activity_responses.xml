@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <!-- Filtro para selecionar entre respostas "Sim" e "Não" -->
     <LinearLayout
-        android:id="@+id/linearLayoutFiltro"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- CheckBox para "Sim" -->
-        <CheckBox
-            android:id="@+id/checkSim"
-            android:layout_width="wrap_content"
+        <!-- Exibição das respostas -->
+        <TextView
+            android:id="@+id/respostasTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sim" />
+            android:text="Respostas serão exibidas aqui"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"/>
 
-        <!-- CheckBox para "Não" -->
-        <CheckBox
-            android:id="@+id/checkNao"
-            android:layout_width="wrap_content"
+        <!-- Filtros para as respostas: Sim e Não -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Não" />
+            android:orientation="horizontal"
+            android:gravity="center">
+            <CheckBox
+                android:id="@+id/checkSim"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sim" />
+            <CheckBox
+                android:id="@+id/checkNao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Não"
+                android:layout_marginLeft="16dp" />
+        </LinearLayout>
+
+        <!-- Container para os gráficos gerados -->
+        <LinearLayout
+            android:id="@+id/linearLayoutGrafico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"/>
+
     </LinearLayout>
-
-
-    <!-- Gráfico de respostas -->
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginTop="16dp"/>
-
-    <!-- Exibe as respostas -->
-    <TextView
-        android:id="@+id/respostasTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Respostas"
-        android:padding="16dp" />
-</LinearLayout>
+</android.widget.ScrollView>
