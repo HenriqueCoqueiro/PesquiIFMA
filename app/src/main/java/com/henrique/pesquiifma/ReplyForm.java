@@ -63,13 +63,16 @@ public class ReplyForm extends AppCompatActivity {
                             for (Map<String, Object> questionMap : questions) {
                                 String questionTextStr = (String) questionMap.get("pergunta");
                                 String questionId = (String) questionMap.get("id"); // Obtém o id da pergunta
+                                String tipoResposta = (String) questionMap.get("tipoResposta"); // Tipo de resposta
 
-                                // Verifica se a pergunta é do tipo "Sim/Não"
-                                if (questionTextStr.contains("Sim/Não")) {
+                                // Verifica o tipo de resposta e chama o método adequado para cada tipo
+                                if ("Texto".equals(tipoResposta)) {
+                                    createTextQuestion(questionTextStr, questionId);
+                                }
+                                else if ("Sim/Não".equals(tipoResposta)) {
                                     createYesNoQuestion(questionTextStr, questionId);
                                 }
-                                // Verifica se a pergunta é do tipo "Múltipla Escolha"
-                                else if (questionTextStr.contains("Múltipla Escolha")) {
+                                else if ("Múltipla Escolha".equals(tipoResposta)) {
                                     // Extração da parte da string que contém as opções
                                     String optionsString = questionTextStr.split(":")[1].trim();  // Obtém a parte após ":"
                                     optionsString = optionsString.substring(1, optionsString.length() - 1);  // Remove os colchetes []
@@ -79,9 +82,6 @@ public class ReplyForm extends AppCompatActivity {
 
                                     // Agora passamos a lista de opções para o método de criação da pergunta
                                     createMultipleChoiceQuestion(questionTextStr, optionsList, questionId);
-                                }
-                                else {
-                                    createTextQuestion(questionTextStr, questionId);
                                 }
                             }
                         }

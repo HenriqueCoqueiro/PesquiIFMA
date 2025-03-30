@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -77,8 +76,8 @@ public class CreatForm extends AppCompatActivity {
                 return;
             }
 
-            if (tipoResposta.equals("Múltipla Escolha")) {
-                mostrarDialogoAdicionarOpcoes(pergunta);
+            if (tipoResposta.equals("Múltipla Escolha") || tipoResposta.equals("SIM/Não")) {
+                mostrarDialogoAdicionarOpcoes(pergunta, tipoResposta);
             } else {
                 listaPerguntas.add(pergunta + " (" + tipoResposta + ")");
                 adapter.notifyDataSetChanged();
@@ -89,7 +88,7 @@ public class CreatForm extends AppCompatActivity {
         builder.show();
     }
 
-    private void mostrarDialogoAdicionarOpcoes(String pergunta) {
+    private void mostrarDialogoAdicionarOpcoes(String pergunta, String tipoResposta) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Adicionar Opções");
 
@@ -114,7 +113,7 @@ public class CreatForm extends AppCompatActivity {
         builder.setView(view);
         builder.setPositiveButton("Salvar", (dialog, which) -> {
             if (!listaOpcoes.isEmpty()) {
-                String perguntaComOpcoes = pergunta + " (Múltipla Escolha): " + listaOpcoes.toString();
+                String perguntaComOpcoes = pergunta + " (" + tipoResposta + "): " + listaOpcoes.toString();
                 listaPerguntas.add(perguntaComOpcoes);
                 adapter.notifyDataSetChanged();
             } else {
@@ -139,8 +138,17 @@ public class CreatForm extends AppCompatActivity {
         ArrayList<Map<String, Object>> perguntasList = new ArrayList<>();
         for (String pergunta : listaPerguntas) {
             Map<String, Object> perguntaData = new HashMap<>();
+            String tipoResposta = "Texto"; // Default
+
+            // Verifica o tipo de resposta
+            if (pergunta.contains("Sim/Não")) {
+                tipoResposta = "Sim/Não";
+            } else if (pergunta.contains("Múltipla Escolha")) {
+                tipoResposta = "Múltipla Escolha";
+            }
+
             perguntaData.put("pergunta", pergunta);
-            perguntaData.put("tipoResposta", "Texto"); // Ajuste conforme necessário
+            perguntaData.put("tipoResposta", tipoResposta);
             perguntasList.add(perguntaData);
         }
 
