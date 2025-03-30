@@ -140,11 +140,14 @@ public class CreatForm extends AppCompatActivity {
             Map<String, Object> perguntaData = new HashMap<>();
             String tipoResposta = "Texto"; // Default
 
-            // Verifica o tipo de resposta
-            if (pergunta.contains("Sim/Não")) {
-                tipoResposta = "Sim/Não";
-            } else if (pergunta.contains("Múltipla Escolha")) {
-                tipoResposta = "Múltipla Escolha";
+            // Verifica e remove o tipo de resposta
+            String[] tipos = {"Sim/Não", "Múltipla Escolha", "Número", "Texto", "Data"};
+            for (String tipo : tipos) {
+                if (pergunta.contains(" (" + tipo + ")")) {
+                    tipoResposta = tipo;
+                    pergunta = pergunta.replace(" (" + tipo + ")", "").trim();
+                    break;
+                }
             }
 
             perguntaData.put("pergunta", pergunta);
@@ -152,54 +155,22 @@ public class CreatForm extends AppCompatActivity {
             perguntasList.add(perguntaData);
         }
 
-        // Obter o UID do usuário atual
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String uid = user != null ? user.getUid() : "";
 
-        // Criar o objeto do formulário com o UID
         Map<String, Object> form = new HashMap<>();
         form.put("titulo", titulo);
         form.put("descricao", descricao);
         form.put("perguntas", perguntasList);
-        form.put("uid", uid); // Adiciona o UID
+        form.put("uid", uid);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("formularios")
                 .add(form)
                 .addOnSuccessListener(documentReference -> {
-                    // Gerar o formId usando o ID do documento
                     String formId = documentReference.getId();
                     String link = "https://pesqui-ifma.com/form/" + formId;
-
-                    // Atualizar o documento com o formId e o link
-                    Map<String, Object> updateMap = new HashMap<>();
-                    updateMap.put("formId", formId); // Atualizando o formId
-                    updateMap.put("link", link); // Atualizando o link
-
-                    // Atualizar o documento
-                    documentReference.update(updateMap)
-                            .addOnSuccessListener(aVoid -> {
-                                // Exibir o link na tela
-                                TextView textViewLink = findViewById(R.id.textViewLink);
-                                textViewLink.setText("Link do formulário: " + link);
-                                textViewLink.setVisibility(View.VISIBLE);
-
-                                // Tornar o link clicável
-                                textViewLink.setOnClickListener(v -> {
-                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-                                    startActivity(intent);
-                                });
-
-                                Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(this, "Erro ao salvar o link do formulário!", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Erro ao salvar o formulário!", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    documentReference.update("formId", formId, "link", link);
                 });
     }
 }
