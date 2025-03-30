@@ -168,9 +168,38 @@ public class CreatForm extends AppCompatActivity {
         db.collection("formularios")
                 .add(form)
                 .addOnSuccessListener(documentReference -> {
+                    // Gerar o formId usando o ID do documento
                     String formId = documentReference.getId();
                     String link = "https://pesqui-ifma.com/form/" + formId;
-                    documentReference.update("formId", formId, "link", link);
+
+                    // Atualizar o documento com o formId e o link
+                    Map<String, Object> updateMap = new HashMap<>();
+                    updateMap.put("formId", formId); // Atualizando o formId
+                    updateMap.put("link", link); // Atualizando o link
+
+                    // Atualizar o documento
+                    documentReference.update(updateMap)
+                            .addOnSuccessListener(aVoid -> {
+                                // Exibir o link na tela
+                                TextView textViewLink = findViewById(R.id.textViewLink);
+                                textViewLink.setText("Link do formulário: " + link);
+                                textViewLink.setVisibility(View.VISIBLE);
+
+                                // Tornar o link clicável
+                                textViewLink.setOnClickListener(v -> {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                                    startActivity(intent);
+                                });
+
+                                Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Erro ao salvar o link do formulário!", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Erro ao salvar o formulário!", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 });
-    }
-}
+    }}
