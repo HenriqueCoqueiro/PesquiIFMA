@@ -34,6 +34,8 @@ public class ReplyForm extends AppCompatActivity {
     private List<RadioGroup> radioGroups = new ArrayList<>();
     private List<EditText> answerFields = new ArrayList<>();
     private List<CheckBox> singleChoiceCheckboxes = new ArrayList<>();
+    private List<List<CheckBox>> multipleChoiceGroups = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>();  // Lista para armazenar perguntas e seus tipos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,27 +63,26 @@ public class ReplyForm extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        List<Map<String, Object>> questions = (List<Map<String, Object>>) documentSnapshot.get("perguntas");
+                        List<Map<String, Object>> questionsData = (List<Map<String, Object>>) documentSnapshot.get("perguntas");
                         uid = documentSnapshot.getString("uid");
 
-                        if (questions != null) {
-                            for (Map<String, Object> questionMap : questions) {
+                        if (questionsData != null) {
+                            for (Map<String, Object> questionMap : questionsData) {
                                 String questionTextStr = (String) questionMap.get("pergunta");
                                 String questionId = (String) questionMap.get("id");
                                 String tipoResposta = (String) questionMap.get("tipoResposta");
+
+                                Question question = new Question(questionTextStr, tipoResposta);
+                                questions.add(question);  // Adiciona à lista de perguntas
 
                                 if ("Texto".equals(tipoResposta)) {
                                     createTextQuestion(questionTextStr);
                                 } else if ("Sim/Não".equals(tipoResposta)) {
                                     createYesNoQuestion(questionTextStr);
                                 } else if ("Múltipla Escolha".equals(tipoResposta)) {
-                                    // Extração da parte da string que contém as opções
-                                    String optionsString = questionTextStr.split(":")[1].trim();  // Obtém a parte após ":"
-                                    optionsString = optionsString.substring(1, optionsString.length() - 1);  // Remove os colchetes []
-
-                                    // Divida a string com base nas vírgulas para obter a lista de opções
-                                    List<String> opcoes = Arrays.asList(optionsString.split(",\\s*"));  // Divide e remove os espaços
-
+                                    String optionsString = questionTextStr.split(":")[1].trim();
+                                    optionsString = optionsString.substring(1, optionsString.length() - 1);
+                                    List<String> opcoes = Arrays.asList(optionsString.split(",\\s*"));
                                     createMultipleChoiceQuestion(questionTextStr, opcoes);
                                 } else if ("Escolha Única".equals(tipoResposta)) {
                                     createSingleChoiceQuestion(questionTextStr);
@@ -133,17 +134,15 @@ public class ReplyForm extends AppCompatActivity {
         questionTextView.setText(questionText);
         questionsContainer.addView(questionTextView);
 
-        RadioGroup radioGroup = new RadioGroup(this);
-        radioGroup.setOrientation(RadioGroup.VERTICAL);
-
+        List<CheckBox> checkBoxes = new ArrayList<>();
         for (String option : options) {
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(option);
-            radioGroup.addView(radioButton);
+            CheckBox checkBox = new CheckBox(this);
+            checkBox.setText(option);
+            questionsContainer.addView(checkBox);
+            checkBoxes.add(checkBox);
         }
 
-        questionsContainer.addView(radioGroup);
-        radioGroups.add(radioGroup);
+        multipleChoiceGroups.add(checkBoxes);
     }
 
     private void createSingleChoiceQuestion(String questionText) {
@@ -161,25 +160,37 @@ public class ReplyForm extends AppCompatActivity {
     private void submitAnswers() {
         List<String> answers = new ArrayList<>();
 
-        // Coleta respostas de texto
-        for (EditText field : answerFields) {
-            answers.add(field.getText().toString());
-        }
-
-        // Coleta respostas de radio buttons
-        for (RadioGroup group : radioGroups) {
-            int selectedId = group.getCheckedRadioButtonId();
-            if (selectedId != -1) {
-                RadioButton selected = group.findViewById(selectedId);
-                answers.add(selected.getText().toString());
-            } else {
-                answers.add("");
+        // Coleta respostas com base na ordem das perguntas
+        for (Question question : questions) {
+            if ("Texto".equals(question.getTipoResposta())) {
+                for (EditText field : answerFields) {
+                    answers.add(field.getText().toString());
+                }
+            } else if ("Sim/Não".equals(question.getTipoResposta())) {
+                for (RadioGroup group : radioGroups) {
+                    int selectedId = group.getCheckedRadioButtonId();
+                    if (selectedId != -1) {
+                        RadioButton selected = group.findViewById(selectedId);
+                        answers.add(selected.getText().toString());
+                    } else {
+                        answers.add("");
+                    }
+                }
+            } else if ("Escolha Única".equals(question.getTipoResposta())) {
+                for (CheckBox checkBox : singleChoiceCheckboxes) {
+                    answers.add(checkBox.isChecked() ? "Selecionado" : "Não selecionado");
+                }
+            } else if ("Múltipla Escolha".equals(question.getTipoResposta())) {
+                for (List<CheckBox> checkBoxList : multipleChoiceGroups) {
+                    List<String> selectedOptions = new ArrayList<>();
+                    for (CheckBox cb : checkBoxList) {
+                        if (cb.isChecked()) {
+                            selectedOptions.add(cb.getText().toString());
+                        }
+                    }
+                    answers.add(String.join(", ", selectedOptions));
+                }
             }
-        }
-
-        // Coleta respostas de escolha única
-        for (CheckBox checkBox : singleChoiceCheckboxes) {
-            answers.add(checkBox.isChecked() ? "Selecionado" : "Não selecionado");
         }
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -199,5 +210,24 @@ public class ReplyForm extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(ReplyForm.this, "Erro ao enviar respostas.", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    // Classe interna para armazenar perguntas
+    private static class Question {
+        private String texto;
+        private String tipoResposta;
+
+        public Question(String texto, String tipoResposta) {
+            this.texto = texto;
+            this.tipoResposta = tipoResposta;
+        }
+
+        public String getTexto() {
+            return texto;
+        }
+
+        public String getTipoResposta() {
+            return tipoResposta;
+        }
     }
 }

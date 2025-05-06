@@ -167,9 +167,13 @@ public class ViewResponses extends AppCompatActivity {
                         contagemNao.put(i, contagemNao.getOrDefault(i, 0) + 1);
                     }
                 } else if (tipo.equalsIgnoreCase("Múltipla Escolha")) {
-                    contagemMultiplaEscolha.putIfAbsent(i, new HashMap<>());
-                    Map<String, Integer> contagemResposta = contagemMultiplaEscolha.get(i);
-                    contagemResposta.put(resposta, contagemResposta.getOrDefault(resposta, 0) + 1);
+                    // Separar as respostas múltiplas por vírgula e contar individualmente
+                    String[] opcoesSelecionadas = resposta.split(",\\s*");
+                    for (String opcao : opcoesSelecionadas) {
+                        contagemMultiplaEscolha.putIfAbsent(i, new HashMap<>());
+                        Map<String, Integer> contagemResposta = contagemMultiplaEscolha.get(i);
+                        contagemResposta.put(opcao, contagemResposta.getOrDefault(opcao, 0) + 1);
+                    }
                 }
             }
         }
