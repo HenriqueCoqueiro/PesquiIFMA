@@ -9,4 +9,20 @@
     <color name="soft_red">#DE4B5E</color>
     <color name="colorAccent">#9536F4</color>
 
+    <!-- Cor principal do texto (escuro) -->
+    <color name="colorPrimaryDark">#212121</color>
+
+    <!-- Cor de destaque dos botões -->
+
+    <!-- Cor de fundo das seções -->
+    <color name="colorSectionBackground">#F1F1F1</color>
+
+    <!-- Cor para os separadores (linha de separação) -->
+    <color name="colorSeparator">#BDBDBD</color>
+
+    <color name="colorLightBlue">#E1F5FE</color>
+    <color name="colorLightGreen">#E8F5E9</color>
+    <color name="colorLightYellow">#FFF9C4</color>
+
+
 </resources>

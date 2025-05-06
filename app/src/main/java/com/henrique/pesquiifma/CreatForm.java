@@ -11,11 +11,14 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,9 +79,11 @@ public class CreatForm extends AppCompatActivity {
                 return;
             }
 
-            if (tipoResposta.equals("Múltipla Escolha") || tipoResposta.equals("SIM/Não")) {
+            // "Múltipla Escolha" e "Sim/Não" precisam de opções
+            if (tipoResposta.equals("Múltipla Escolha") || tipoResposta.equals("Sim/Não")) {
                 mostrarDialogoAdicionarOpcoes(pergunta, tipoResposta);
             } else {
+                // "Escolha Única" não precisa de opções
                 listaPerguntas.add(pergunta + " (" + tipoResposta + ")");
                 adapter.notifyDataSetChanged();
             }
@@ -98,9 +103,17 @@ public class CreatForm extends AppCompatActivity {
         ListView listViewOpcoes = view.findViewById(R.id.listViewOpcoes);
 
         ArrayList<String> listaOpcoes = new ArrayList<>();
+
+        // Se a pergunta for do tipo "Sim/Não", preenche as opções automaticamente
+        if (tipoResposta.equals("Sim/Não")) {
+            listaOpcoes.add("Sim");
+            listaOpcoes.add("Não");
+        }
+
         ArrayAdapter<String> adapterOpcoes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaOpcoes);
         listViewOpcoes.setAdapter(adapterOpcoes);
 
+        // Adicionar opção manualmente
         buttonAdicionarOpcao.setOnClickListener(v -> {
             String opcao = editTextOpcao.getText().toString().trim();
             if (!opcao.isEmpty()) {
@@ -134,14 +147,12 @@ public class CreatForm extends AppCompatActivity {
             return;
         }
 
-        // Criar a estrutura de perguntas para o formulário
         ArrayList<Map<String, Object>> perguntasList = new ArrayList<>();
         for (String pergunta : listaPerguntas) {
             Map<String, Object> perguntaData = new HashMap<>();
             String tipoResposta = "Texto"; // Default
 
-            // Verifica e remove o tipo de resposta
-            String[] tipos = {"Sim/Não", "Múltipla Escolha", "Número", "Texto", "Data"};
+            String[] tipos = {"Sim/Não", "Múltipla Escolha", "Escolha Única", "Texto", "Data", "Número"};
             for (String tipo : tipos) {
                 if (pergunta.contains(" (" + tipo + ")")) {
                     tipoResposta = tipo;
@@ -168,24 +179,19 @@ public class CreatForm extends AppCompatActivity {
         db.collection("formularios")
                 .add(form)
                 .addOnSuccessListener(documentReference -> {
-                    // Gerar o formId usando o ID do documento
                     String formId = documentReference.getId();
                     String link = "https://pesqui-ifma.com/form/" + formId;
 
-                    // Atualizar o documento com o formId e o link
                     Map<String, Object> updateMap = new HashMap<>();
-                    updateMap.put("formId", formId); // Atualizando o formId
-                    updateMap.put("link", link); // Atualizando o link
+                    updateMap.put("formId", formId);
+                    updateMap.put("link", link);
 
-                    // Atualizar o documento
                     documentReference.update(updateMap)
                             .addOnSuccessListener(aVoid -> {
-                                // Exibir o link na tela
                                 TextView textViewLink = findViewById(R.id.textViewLink);
                                 textViewLink.setText("Link do formulário: " + link);
                                 textViewLink.setVisibility(View.VISIBLE);
-
-                                // Tornar o link clicável
+                                textViewLink.setTextIsSelectable(true);
                                 textViewLink.setOnClickListener(v -> {
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
                                     startActivity(intent);
@@ -202,4 +208,5 @@ public class CreatForm extends AppCompatActivity {
                     Toast.makeText(this, "Erro ao salvar o formulário!", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 });
-    }}
+    }
+}

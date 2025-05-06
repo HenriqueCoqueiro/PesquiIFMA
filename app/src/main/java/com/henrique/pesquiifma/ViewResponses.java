@@ -3,19 +3,22 @@ package com.henrique.pesquiifma;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,19 +27,25 @@ import java.util.Map;
 
 public class ViewResponses extends AppCompatActivity {
 
-    private List<String> respostasList;
-    private TextView respostasTextView;
+    private TextView perguntasTextView;
+    private LinearLayout respostasContainer;
+    private LinearLayout graficosContainer;
+    private Switch switchModo;
+    private Button btnAnterior, btnProxima;
 
-    // Definir um conjunto de cores mais estéticas
+    private List<Map<String, Object>> perguntas = new ArrayList<>();
+    private List<List<String>> respostasPorUsuario = new ArrayList<>();
+    private int indiceRespostaAtual = 0;
+
     private static final int[] ESTHETIC_COLORS = {
-            Color.parseColor("#FFB6B9"),  // Light Pink
-            Color.parseColor("#FF677D"),  // Muted Pink
-            Color.parseColor("#D4A5A5"),  // Light Red
-            Color.parseColor("#392F5A"),  // Dark Purple
-            Color.parseColor("#1D2D50"),  // Navy Blue
-            Color.parseColor("#61C0BF"),  // Teal
-            Color.parseColor("#6B4226"),  // Warm Brown
-            Color.parseColor("#D9BF77")   // Gold
+            Color.parseColor("#FFB6B9"),
+            Color.parseColor("#FF677D"),
+            Color.parseColor("#D4A5A5"),
+            Color.parseColor("#392F5A"),
+            Color.parseColor("#1D2D50"),
+            Color.parseColor("#61C0BF"),
+            Color.parseColor("#6B4226"),
+            Color.parseColor("#D9BF77")
     };
 
     @Override
@@ -44,157 +53,190 @@ public class ViewResponses extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_responses);
 
-        respostasTextView = findViewById(R.id.respostasTextView);
+        perguntasTextView = findViewById(R.id.perguntasTextView);
+        respostasContainer = findViewById(R.id.respostasContainer);
+        graficosContainer = findViewById(R.id.graficosContainer);
+        switchModo = findViewById(R.id.switchModo);
+        btnAnterior = findViewById(R.id.btnAnterior);
+        btnProxima = findViewById(R.id.btnProxima);
 
-        // Pega o formId passado da activity anterior
         String formId = getIntent().getStringExtra("formId");
 
-        // Log para verificar o valor do formId
-        Log.d("RespostasActivity", "formId recebido: " + formId);
-
         if (formId != null) {
-            carregarRespostas(formId);
+            carregarDadosFormulario(formId);
         } else {
             Toast.makeText(this, "Erro: Formulário não encontrado!", Toast.LENGTH_SHORT).show();
         }
+
+        switchModo.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            atualizarInterface();
+        });
+
+        btnAnterior.setOnClickListener(v -> {
+            if (indiceRespostaAtual > 0) {
+                indiceRespostaAtual--;
+                atualizarInterface();
+            }
+        });
+
+        btnProxima.setOnClickListener(v -> {
+            if (indiceRespostaAtual < respostasPorUsuario.size() - 1) {
+                indiceRespostaAtual++;
+                atualizarInterface();
+            }
+        });
     }
 
-    private void carregarRespostas(String formId) {
+    private void carregarDadosFormulario(String formId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("formularios").document(formId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    perguntas = (List<Map<String, Object>>) documentSnapshot.get("perguntas");
+                    mostrarPerguntas();
 
-        // Buscar as respostas na subcoleção "respostas" usando o formId
-        db.collection("formularios")
-                .document(formId)
-                .collection("respostas")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    respostasList = new ArrayList<>();
-
-                    // Processa as respostas associadas à pergunta
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        String perguntaId = document.getString("perguntaId");
-                        String resposta = document.getString("resposta");
-
-                        if (perguntaId != null && resposta != null) {
-                            respostasList.add(perguntaId + ":" + resposta); // Combine perguntaId e resposta
-                        }
-                    }
-
-                    if (!respostasList.isEmpty()) {
-                        StringBuilder respostasText = new StringBuilder();
-                        for (String resposta : respostasList) {
-                            respostasText.append(resposta).append("\n");
-                        }
-                        respostasTextView.setText(respostasText.toString());
-                        exibirGraficos();  // Exibir gráficos para todas as respostas
-                    } else {
-                        respostasTextView.setText("Nenhuma resposta encontrada.");
-                    }
+                    db.collection("formularios").document(formId).collection("respostas")
+                            .get()
+                            .addOnSuccessListener(querySnapshots -> {
+                                for (QueryDocumentSnapshot doc : querySnapshots) {
+                                    List<String> respostas = (List<String>) doc.get("answers");
+                                    respostasPorUsuario.add(respostas);
+                                }
+                                atualizarInterface();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(this, "Erro ao carregar respostas", Toast.LENGTH_SHORT).show());
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Erro ao carregar as respostas!", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Toast.makeText(this, "Erro ao carregar formulário", Toast.LENGTH_SHORT).show());
     }
 
-    private void exibirGraficos() {
-        // Cria um mapa para armazenar a contagem de respostas por pergunta
-        Map<String, Map<String, Integer>> respostasPorPergunta = new HashMap<>();
+    private void mostrarPerguntas() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < perguntas.size(); i++) {
+            Map<String, Object> pergunta = perguntas.get(i);
+            sb.append(i + 1).append(". ").append(pergunta.get("pergunta")).append("\n");
+        }
+        perguntasTextView.setText(sb.toString());
+    }
 
-        // Processa as respostas
-        for (String resposta : respostasList) {
-            String[] partes = resposta.split(":");  // Separar perguntaId e resposta
-            if (partes.length == 2) {
-                String perguntaId = partes[0];
-                String respostaValor = partes[1];
+    private void atualizarInterface() {
+        respostasContainer.removeAllViews();
+        graficosContainer.removeAllViews();
 
-                // Inicializa o mapa de respostas para a pergunta se necessário
-                if (!respostasPorPergunta.containsKey(perguntaId)) {
-                    respostasPorPergunta.put(perguntaId, new HashMap<>());
+        boolean modoUnico = switchModo.isChecked();
+        btnAnterior.setVisibility(modoUnico ? View.VISIBLE : View.GONE);
+        btnProxima.setVisibility(modoUnico ? View.VISIBLE : View.GONE);
+
+        if (modoUnico) {
+            if (!respostasPorUsuario.isEmpty()) {
+                exibirRespostasUsuario(indiceRespostaAtual);
+            }
+        } else {
+            for (int i = 0; i < respostasPorUsuario.size(); i++) {
+                adicionarTitulo("Respostas do usuário " + (i + 1));
+                exibirRespostasUsuario(i);
+            }
+        }
+
+        mostrarGraficosSimNao();
+    }
+
+    private void exibirRespostasUsuario(int index) {
+        List<String> respostas = respostasPorUsuario.get(index);
+        for (int i = 0; i < perguntas.size(); i++) {
+            String texto = (i + 1) + ". " + perguntas.get(i).get("pergunta") + "\nResposta: " + respostas.get(i);
+            TextView tv = new TextView(this);
+            tv.setText(texto);
+            tv.setPadding(0, 16, 0, 16);
+            respostasContainer.addView(tv);
+        }
+    }
+
+    private void mostrarGraficosSimNao() {
+        Map<Integer, Integer> contagemSim = new HashMap<>();
+        Map<Integer, Integer> contagemNao = new HashMap<>();
+        Map<Integer, Map<String, Integer>> contagemMultiplaEscolha = new HashMap<>();
+
+        for (List<String> respostas : respostasPorUsuario) {
+            for (int i = 0; i < perguntas.size(); i++) {
+                String tipo = (String) perguntas.get(i).get("tipoResposta");
+                String resposta = respostas.get(i);
+
+                if (tipo.equalsIgnoreCase("Sim/Não")) {
+                    if (resposta.equalsIgnoreCase("Sim")) {
+                        contagemSim.put(i, contagemSim.getOrDefault(i, 0) + 1);
+                    } else if (resposta.equalsIgnoreCase("Não")) {
+                        contagemNao.put(i, contagemNao.getOrDefault(i, 0) + 1);
+                    }
+                } else if (tipo.equalsIgnoreCase("Múltipla Escolha")) {
+                    contagemMultiplaEscolha.putIfAbsent(i, new HashMap<>());
+                    Map<String, Integer> contagemResposta = contagemMultiplaEscolha.get(i);
+                    contagemResposta.put(resposta, contagemResposta.getOrDefault(resposta, 0) + 1);
                 }
-
-                Map<String, Integer> contagemRespostas = respostasPorPergunta.get(perguntaId);
-
-                // Conta as respostas para cada valor
-                contagemRespostas.put(respostaValor, contagemRespostas.getOrDefault(respostaValor, 0) + 1);
             }
         }
 
-        // Para cada pergunta, gerar o gráfico com base nas respostas
-        int index = 0;  // Para adicionar múltiplos gráficos em vez de um único
-        for (String perguntaId : respostasPorPergunta.keySet()) {
-            Map<String, Integer> contagemRespostas = respostasPorPergunta.get(perguntaId);
-
-            // Verifica se a pergunta é de múltipla escolha (não apenas "Sim" ou "Não")
-            if (contagemRespostas.size() > 2) {
-                // Gerar gráfico de múltipla escolha
-                criarGraficoMultiplaEscolha(contagemRespostas, perguntaId, index);
-            } else {
-                // Gerar gráfico para respostas "Sim" ou "Não"
-                int simCount = contagemRespostas.getOrDefault("Sim", 0);
-                int naoCount = contagemRespostas.getOrDefault("Não", 0);
-                criarGrafico(simCount, naoCount, perguntaId, index);
+        for (int i = 0; i < perguntas.size(); i++) {
+            String tipo = (String) perguntas.get(i).get("tipoResposta");
+            if (tipo.equalsIgnoreCase("Sim/Não")) {
+                int sim = contagemSim.getOrDefault(i, 0);
+                int nao = contagemNao.getOrDefault(i, 0);
+                adicionarTitulo((i + 1) + ". " + perguntas.get(i).get("pergunta"));
+                criarGrafico(sim, nao);
+            } else if (tipo.equalsIgnoreCase("Múltipla Escolha")) {
+                Map<String, Integer> contagemResposta = contagemMultiplaEscolha.get(i);
+                adicionarTitulo((i + 1) + ". " + perguntas.get(i).get("pergunta"));
+                criarGraficoMultiplaEscolha(contagemResposta);
             }
-            index++;
         }
     }
 
-    private void criarGrafico(int simCount, int naoCount, String perguntaId, int index) {
-        // Criação do gráfico
+    private void adicionarTitulo(String texto) {
+        TextView titulo = new TextView(this);
+        titulo.setText(texto);
+        titulo.setTextSize(18f);
+        titulo.setTextColor(Color.BLACK);
+        titulo.setPadding(0, 32, 0, 8);
+        graficosContainer.addView(titulo);
+    }
+
+    private void criarGrafico(int simCount, int naoCount) {
         PieChart pieChart = new PieChart(this);
         pieChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
-        LinearLayout linearLayout = findViewById(R.id.linearLayoutGrafico);
-        linearLayout.addView(pieChart);
+        graficosContainer.addView(pieChart);
 
         ArrayList<PieEntry> entries = new ArrayList<>();
+        if (simCount > 0) entries.add(new PieEntry(simCount, "Sim"));
+        if (naoCount > 0) entries.add(new PieEntry(naoCount, "Não"));
 
-        // Adiciona entradas para "Sim" e "Não" se houverem respostas
-        if (simCount > 0) {
-            entries.add(new PieEntry(simCount, "Sim"));
-        }
-        if (naoCount > 0) {
-            entries.add(new PieEntry(naoCount, "Não"));
-        }
-
-        // Criação do dataset para o gráfico
-        PieDataSet dataSet = new PieDataSet(entries, "Respostas para " + perguntaId);
+        PieDataSet dataSet = new PieDataSet(entries, "");
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(ESTHETIC_COLORS[0]); // Cor para "Sim"
-        colors.add(ESTHETIC_COLORS[1]); // Cor para "Não"
+        colors.add(ESTHETIC_COLORS[0]);
+        colors.add(ESTHETIC_COLORS[1]);
         dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
-        pieChart.invalidate(); // Atualiza o gráfico
+        pieChart.invalidate();
     }
 
-    private void criarGraficoMultiplaEscolha(Map<String, Integer> contagemRespostas, String perguntaId, int index) {
-        // Criação do gráfico
+    private void criarGraficoMultiplaEscolha(Map<String, Integer> contagemRespostas) {
         PieChart pieChart = new PieChart(this);
         pieChart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
-        LinearLayout linearLayout = findViewById(R.id.linearLayoutGrafico);
-        linearLayout.addView(pieChart);
+        graficosContainer.addView(pieChart);
 
         ArrayList<PieEntry> entries = new ArrayList<>();
-
-        // Adiciona entradas para cada opção de resposta de múltipla escolha
         for (Map.Entry<String, Integer> entry : contagemRespostas.entrySet()) {
-            String resposta = entry.getKey();
-            int count = entry.getValue();
-            entries.add(new PieEntry(count, resposta));
+            entries.add(new PieEntry(entry.getValue(), entry.getKey()));
         }
 
-        // Criação do dataset para o gráfico
-        PieDataSet dataSet = new PieDataSet(entries, "Respostas para " + perguntaId);
+        PieDataSet dataSet = new PieDataSet(entries, "Respostas");
         ArrayList<Integer> colors = new ArrayList<>();
-
-        // Adiciona cores estéticas para cada entrada de resposta
         for (int i = 0; i < entries.size(); i++) {
-            colors.add(ESTHETIC_COLORS[i % ESTHETIC_COLORS.length]);  // Usa cores do conjunto estético
+            colors.add(ESTHETIC_COLORS[i % ESTHETIC_COLORS.length]);
         }
         dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
-        pieChart.invalidate(); // Atualiza o gráfico
+        pieChart.invalidate();
     }
 }

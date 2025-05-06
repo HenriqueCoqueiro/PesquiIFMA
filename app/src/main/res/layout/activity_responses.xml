@@ -1,30 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Exibição das respostas -->
+        <!-- Título e descrição do formulário (opcional) -->
         <TextView
-            android:id="@+id/respostasTextView"
+            android:id="@+id/perguntasTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Respostas serão exibidas aqui"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp"/>
+            android:text="Perguntas"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="16dp"/>
 
-        <!-- Container para os gráficos gerados -->
+        <!-- Switch para alternar entre modo de visualização de todas as respostas ou uma por vez -->
+        <Switch
+            android:id="@+id/switchModo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Visualizar uma resposta por vez"
+            android:paddingBottom="16dp"/>
+
+        <!-- Contêiner para as respostas dos usuários -->
         <LinearLayout
-            android:id="@+id/linearLayoutGrafico"
+            android:id="@+id/respostasContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <!-- Botões para navegação entre as respostas -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="16dp">
+
+            <Button
+                android:id="@+id/btnAnterior"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Anterior"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnProxima"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Próxima"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Contêiner para os gráficos -->
+        <LinearLayout
+            android:id="@+id/graficosContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="16dp"/>
+            android:paddingTop="16dp">
+
+            <!-- Gráficos de Múltipla Escolha vão aqui -->
+            <LinearLayout
+                android:id="@+id/graficoMultiplaEscolhaContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
 
     </LinearLayout>
-</android.widget.ScrollView>
+</ScrollView>
