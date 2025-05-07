@@ -82,10 +82,17 @@ public class ViewResponses extends AppCompatActivity {
         btnProxima.setOnClickListener(v -> {
             if (indiceRespostaAtual < respostasPorUsuario.size() - 1) {
                 indiceRespostaAtual++;
+
+                if (respostasPorUsuario.isEmpty()) {
+                    Toast.makeText(this, "Nenhuma resposta encontrada.", Toast.LENGTH_SHORT).show();
+                    return; // Evita o erro de tentar exibir gráficos e respostas sem dados
+                }
+
                 atualizarInterface();
             }
         });
     }
+
 
     private void carregarDadosFormulario(String formId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

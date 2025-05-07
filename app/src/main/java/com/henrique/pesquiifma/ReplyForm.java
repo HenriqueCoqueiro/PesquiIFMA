@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -100,19 +101,25 @@ public class ReplyForm extends AppCompatActivity {
     }
 
     private void createTextQuestion(String questionText) {
+        LinearLayout questionBlock = createQuestionBlock();
+
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
-        questionsContainer.addView(questionTextView);
+        questionBlock.addView(questionTextView);
 
         EditText answerField = new EditText(this);
-        questionsContainer.addView(answerField);
+        questionBlock.addView(answerField);
         answerFields.add(answerField);
+
+        questionsContainer.addView(questionBlock);
     }
 
     private void createYesNoQuestion(String questionText) {
+        LinearLayout questionBlock = createQuestionBlock();
+
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
-        questionsContainer.addView(questionTextView);
+        questionBlock.addView(questionTextView);
 
         RadioGroup radioGroup = new RadioGroup(this);
         radioGroup.setOrientation(RadioGroup.VERTICAL);
@@ -125,36 +132,60 @@ public class ReplyForm extends AppCompatActivity {
         noButton.setText("Não");
         radioGroup.addView(noButton);
 
-        questionsContainer.addView(radioGroup);
+        questionBlock.addView(radioGroup);
         radioGroups.add(radioGroup);
+
+        questionsContainer.addView(questionBlock);
     }
 
     private void createMultipleChoiceQuestion(String questionText, List<String> options) {
+        LinearLayout questionBlock = createQuestionBlock();
+
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
-        questionsContainer.addView(questionTextView);
+        questionBlock.addView(questionTextView);
 
         List<CheckBox> checkBoxes = new ArrayList<>();
         for (String option : options) {
             CheckBox checkBox = new CheckBox(this);
             checkBox.setText(option);
-            questionsContainer.addView(checkBox);
+            questionBlock.addView(checkBox);
             checkBoxes.add(checkBox);
         }
 
         multipleChoiceGroups.add(checkBoxes);
+        questionsContainer.addView(questionBlock);
     }
 
     private void createSingleChoiceQuestion(String questionText) {
+        LinearLayout questionBlock = createQuestionBlock();
+
         TextView questionTextView = new TextView(this);
         questionTextView.setText(questionText);
-        questionsContainer.addView(questionTextView);
+        questionBlock.addView(questionTextView);
 
         CheckBox checkBox = new CheckBox(this);
         checkBox.setText("Selecionar");
-        questionsContainer.addView(checkBox);
-
+        questionBlock.addView(checkBox);
         singleChoiceCheckboxes.add(checkBox);
+
+        questionsContainer.addView(questionBlock);
+    }
+
+    private LinearLayout createQuestionBlock() {
+        LinearLayout questionBlock = new LinearLayout(this);
+        questionBlock.setOrientation(LinearLayout.VERTICAL);
+        questionBlock.setPadding(32, 32, 32, 32);
+        questionBlock.setBackgroundColor(0xFFE6E6FA); // Cor roxa clara pastel
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.setMargins(0, 0, 0, 48); // Espaçamento entre os blocos
+        questionBlock.setLayoutParams(layoutParams);
+
+        return questionBlock;
     }
 
     private void submitAnswers() {
@@ -214,8 +245,8 @@ public class ReplyForm extends AppCompatActivity {
 
     // Classe interna para armazenar perguntas
     private static class Question {
-        private String texto;
-        private String tipoResposta;
+        private final String texto;
+        private final String tipoResposta;
 
         public Question(String texto, String tipoResposta) {
             this.texto = texto;
