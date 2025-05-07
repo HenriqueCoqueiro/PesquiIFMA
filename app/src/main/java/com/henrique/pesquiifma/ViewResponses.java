@@ -53,7 +53,7 @@ public class ViewResponses extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_responses);
 
-        perguntasTextView = findViewById(R.id.perguntasTextView);
+
         respostasContainer = findViewById(R.id.respostasContainer);
         graficosContainer = findViewById(R.id.graficosContainer);
         switchModo = findViewById(R.id.switchModo);
@@ -121,7 +121,7 @@ public class ViewResponses extends AppCompatActivity {
             Map<String, Object> pergunta = perguntas.get(i);
             sb.append(i + 1).append(". ").append(pergunta.get("pergunta")).append("\n");
         }
-        perguntasTextView.setText(sb.toString());
+
     }
 
     private void atualizarInterface() {
@@ -190,11 +190,11 @@ public class ViewResponses extends AppCompatActivity {
             if (tipo.equalsIgnoreCase("Sim/Não")) {
                 int sim = contagemSim.getOrDefault(i, 0);
                 int nao = contagemNao.getOrDefault(i, 0);
-                adicionarTitulo((i + 1) + ". " + perguntas.get(i).get("pergunta"));
+                adicionarTitulo((i + 1) + ". ");
                 criarGrafico(sim, nao);
             } else if (tipo.equalsIgnoreCase("Múltipla Escolha")) {
                 Map<String, Integer> contagemResposta = contagemMultiplaEscolha.get(i);
-                adicionarTitulo((i + 1) + ". " + perguntas.get(i).get("pergunta"));
+                adicionarTitulo((i + 1) + ". ");
                 criarGraficoMultiplaEscolha(contagemResposta);
             }
         }

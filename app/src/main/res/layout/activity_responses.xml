@@ -9,38 +9,43 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Título e descrição do formulário (opcional) -->
+        <!-- Título: Respostas -->
         <TextView
-            android:id="@+id/perguntasTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Perguntas"
+            android:text="Respostas"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:paddingBottom="16dp"/>
+            android:paddingBottom="4dp" />
 
-        <!-- Switch para alternar entre modo de visualização de todas as respostas ou uma por vez -->
+        <!-- Switch para alternar entre modo de visualização -->
         <Switch
             android:id="@+id/switchModo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Visualizar uma resposta por vez"
-            android:paddingBottom="16dp"/>
+            android:checked="true"
+            android:thumbTint= "@color/roxo"
+            android:trackTint="#D1C4E9"
+            android:paddingBottom="16dp" />
 
         <!-- Contêiner para as respostas dos usuários -->
         <LinearLayout
             android:id="@+id/respostasContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:divider="?android:attr/dividerHorizontal"
+            android:showDividers="middle" />
 
-        <!-- Botões para navegação entre as respostas -->
+        <!-- Navegação entre respostas -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:paddingTop="16dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <Button
                 android:id="@+id/btnAnterior"
@@ -49,24 +54,45 @@
                 android:text="Anterior"
                 android:visibility="gone" />
 
+            <View
+                android:layout_width="16dp"
+                android:layout_height="wrap_content" />
+
             <Button
                 android:id="@+id/btnProxima"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Próxima"
                 android:visibility="gone" />
-
         </LinearLayout>
 
-        <!-- Contêiner para os gráficos -->
+        <!-- Separador -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCCCCC"
+            android:layout_marginVertical="8dp" />
+
+        <!-- Título: Gráficos -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gráficos"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <!-- Seção de gráficos -->
         <LinearLayout
             android:id="@+id/graficosContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="16dp">
+            android:background="#F8F8F8"
+            android:padding="12dp"
+            android:elevation="2dp"
+            android:layout_marginBottom="16dp">
 
-            <!-- Gráficos de Múltipla Escolha vão aqui -->
             <LinearLayout
                 android:id="@+id/graficoMultiplaEscolhaContainer"
                 android:layout_width="match_parent"
