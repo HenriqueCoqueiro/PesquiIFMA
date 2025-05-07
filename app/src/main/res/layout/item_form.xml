@@ -5,18 +5,24 @@
     android:padding="16dp"
     android:orientation="vertical">
 
+    <!-- Título com limite de uma linha e truncamento se necessário -->
     <TextView
         android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Título do Formulário"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
+    <!-- Descrição com limite de duas linhas e truncamento se necessário -->
     <TextView
         android:id="@+id/descriptionTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Descrição do formulário"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:maxLines="2"
+        android:ellipsize="end" />
 </LinearLayout>
