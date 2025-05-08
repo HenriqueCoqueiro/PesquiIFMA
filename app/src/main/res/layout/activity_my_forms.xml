@@ -2,17 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp"> <!-- Adiciona padding ao redor do layout -->
 
     <!-- ScrollView para permitir rolagem -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"> <!-- Padding no topo da ScrollView -->
 
         <!-- RecyclerView dentro do ScrollView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" /> <!-- Margem inferior na RecyclerView -->
+
     </ScrollView>
+
+    <!-- Linha divisória simples -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/darker_gray" /> <!-- Linha de separação -->
+
 </LinearLayout>
