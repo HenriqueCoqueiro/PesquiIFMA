@@ -190,37 +190,68 @@ public class ReplyForm extends AppCompatActivity {
 
     private void submitAnswers() {
         List<String> answers = new ArrayList<>();
+        int textIndex = 0;
+        int radioIndex = 0;
+        int singleChoiceIndex = 0;
+        int multipleChoiceIndex = 0;
 
-        // Coleta respostas com base na ordem das perguntas
         for (Question question : questions) {
-            if ("Texto".equals(question.getTipoResposta())) {
-                for (EditText field : answerFields) {
-                    answers.add(field.getText().toString());
-                }
-            } else if ("Sim/Não".equals(question.getTipoResposta())) {
-                for (RadioGroup group : radioGroups) {
-                    int selectedId = group.getCheckedRadioButtonId();
-                    if (selectedId != -1) {
-                        RadioButton selected = group.findViewById(selectedId);
-                        answers.add(selected.getText().toString());
+            switch (question.getTipoResposta()) {
+                case "Texto":
+                    // Pega a resposta correspondente
+                    if (textIndex < answerFields.size()) {
+                        answers.add(answerFields.get(textIndex).getText().toString());
+                        textIndex++;
                     } else {
                         answers.add("");
                     }
-                }
-            } else if ("Escolha Única".equals(question.getTipoResposta())) {
-                for (CheckBox checkBox : singleChoiceCheckboxes) {
-                    answers.add(checkBox.isChecked() ? "Selecionado" : "Não selecionado");
-                }
-            } else if ("Múltipla Escolha".equals(question.getTipoResposta())) {
-                for (List<CheckBox> checkBoxList : multipleChoiceGroups) {
-                    List<String> selectedOptions = new ArrayList<>();
-                    for (CheckBox cb : checkBoxList) {
-                        if (cb.isChecked()) {
-                            selectedOptions.add(cb.getText().toString());
+                    break;
+
+                case "Sim/Não":
+                    if (radioIndex < radioGroups.size()) {
+                        RadioGroup group = radioGroups.get(radioIndex);
+                        int selectedId = group.getCheckedRadioButtonId();
+                        if (selectedId != -1) {
+                            RadioButton selected = group.findViewById(selectedId);
+                            answers.add(selected.getText().toString());
+                        } else {
+                            answers.add("");
                         }
+                        radioIndex++;
+                    } else {
+                        answers.add("");
                     }
-                    answers.add(String.join(", ", selectedOptions));
-                }
+                    break;
+
+                case "Escolha Única":
+                    if (singleChoiceIndex < singleChoiceCheckboxes.size()) {
+                        CheckBox checkBox = singleChoiceCheckboxes.get(singleChoiceIndex);
+                        answers.add(checkBox.isChecked() ? "Selecionado" : "Não selecionado");
+                        singleChoiceIndex++;
+                    } else {
+                        answers.add("");
+                    }
+                    break;
+
+                case "Múltipla Escolha":
+                    if (multipleChoiceIndex < multipleChoiceGroups.size()) {
+                        List<CheckBox> checkBoxList = multipleChoiceGroups.get(multipleChoiceIndex);
+                        List<String> selectedOptions = new ArrayList<>();
+                        for (CheckBox cb : checkBoxList) {
+                            if (cb.isChecked()) {
+                                selectedOptions.add(cb.getText().toString());
+                            }
+                        }
+                        answers.add(String.join(", ", selectedOptions));
+                        multipleChoiceIndex++;
+                    } else {
+                        answers.add("");
+                    }
+                    break;
+
+                default:
+                    answers.add("");
+                    break;
             }
         }
 
@@ -242,6 +273,7 @@ public class ReplyForm extends AppCompatActivity {
                     Toast.makeText(ReplyForm.this, "Erro ao enviar respostas.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     // Classe interna para armazenar perguntas
     private static class Question {
