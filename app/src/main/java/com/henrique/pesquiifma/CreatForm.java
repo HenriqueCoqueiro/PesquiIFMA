@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CreatForm extends AppCompatActivity {
@@ -77,6 +78,11 @@ public class CreatForm extends AppCompatActivity {
             if (pergunta.isEmpty()) {
                 Toast.makeText(CreatForm.this, "Digite uma pergunta!", Toast.LENGTH_SHORT).show();
                 return;
+            }
+
+            // Verifica e remove ":" no final da pergunta
+            if (pergunta.endsWith(":")) {
+                pergunta = pergunta.substring(0, pergunta.length() - 1).trim();
             }
 
             // "Múltipla Escolha" e "Sim/Não" precisam de opções
