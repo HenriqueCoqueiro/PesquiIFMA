@@ -1,6 +1,8 @@
 package com.henrique.pesquiifma;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -27,6 +29,9 @@ public class MyForms extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_forms);
 
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorAccent)));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color=\"#FFFFFF\">" + getSupportActionBar().getTitle() + "</font>"));
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -42,6 +47,23 @@ public class MyForms extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         carregarFormulariosDoUsuario();
+        adapter.setOnDeleteClickListener(position -> {
+            Form formToDelete = formList.get(position);
+            String formId = formToDelete.getFormId();
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("formularios").document(formId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(MyForms.this, "Formulário deletado com sucesso!", Toast.LENGTH_SHORT).show();
+                        formList.remove(position);
+                        adapter.notifyItemRemoved(position);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(MyForms.this, "Falha ao deletar formulário!", Toast.LENGTH_SHORT).show();
+                    });
+        });
+
     }
 
     private void carregarFormulariosDoUsuario() {
@@ -51,7 +73,7 @@ public class MyForms extends AppCompatActivity {
             return; // Se não houver usuário logado, retorna
         }
 
-        String userId = user.getUid(); // Pega o ID do usuário logado
+        String userId = user.getUid(); // Pega o ID do usuário logadokjsfhd antes
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("formularios")

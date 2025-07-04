@@ -1,7 +1,12 @@
 package com.henrique.pesquiifma;
 
+import static com.henrique.pesquiifma.R.color.colorAccent;
+import static com.henrique.pesquiifma.R.color.colorPrimaryDark;
+
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -24,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorAccent)));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color=\"#FFFFFF\">" + getSupportActionBar().getTitle() + "</font>"));
+
 
         auth = FirebaseAuth.getInstance();
         logoutButton = findViewById(R.id.logout_button);

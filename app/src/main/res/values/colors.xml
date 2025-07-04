@@ -7,7 +7,7 @@
         <color name="simColor">#4CAF50</color>  <!-- Verde para "Sim" -->
         <color name="naoColor">#F44336</color>  <!-- Vermelho para "Não" -->
     <color name="soft_red">#DE4B5E</color>
-    <color name="colorAccent">#9536F4</color>
+    <color name="colorAccent">#684ca4</color>
 
     <!-- Cor principal do texto (escuro) -->
     <color name="colorPrimaryDark">#212121</color>

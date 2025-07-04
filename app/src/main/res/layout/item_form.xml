@@ -26,12 +26,31 @@
         android:maxLines="2"
         android:ellipsize="end" />
 
-    <Button
-        android:id="@+id/btn_copy_link"
-        android:layout_width="wrap_content"
+    <!-- Layout horizontal para os botões -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Copiar link"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="end"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/soft_red"
+            android:text="Deletar" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btn_copy_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Copiar link" />
+
+    </LinearLayout>
 
 </LinearLayout>

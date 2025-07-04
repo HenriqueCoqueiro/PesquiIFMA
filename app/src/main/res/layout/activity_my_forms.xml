@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp"> <!-- Adiciona padding ao redor do layout -->
 
-    <!-- ScrollView para permitir rolagem -->
+    <!-- ScrollView para permitir rolagem oii-->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

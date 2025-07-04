@@ -1,8 +1,10 @@
 package com.henrique.pesquiifma;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -16,7 +18,6 @@ import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -53,6 +54,8 @@ public class ViewResponses extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_responses);
 
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorAccent)));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color=\"#FFFFFF\">" + getSupportActionBar().getTitle() + "</font>"));
 
         respostasContainer = findViewById(R.id.respostasContainer);
         graficosContainer = findViewById(R.id.graficosContainer);
@@ -68,9 +71,7 @@ public class ViewResponses extends AppCompatActivity {
             Toast.makeText(this, "Erro: Formulário não encontrado!", Toast.LENGTH_SHORT).show();
         }
 
-        switchModo.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            atualizarInterface();
-        });
+        switchModo.setOnCheckedChangeListener((buttonView, isChecked) -> atualizarInterface());
 
         btnAnterior.setOnClickListener(v -> {
             if (indiceRespostaAtual > 0) {
@@ -82,17 +83,10 @@ public class ViewResponses extends AppCompatActivity {
         btnProxima.setOnClickListener(v -> {
             if (indiceRespostaAtual < respostasPorUsuario.size() - 1) {
                 indiceRespostaAtual++;
-
-                if (respostasPorUsuario.isEmpty()) {
-                    Toast.makeText(this, "Nenhuma resposta encontrada.", Toast.LENGTH_SHORT).show();
-                    return; // Evita o erro de tentar exibir gráficos e respostas sem dados
-                }
-
                 atualizarInterface();
             }
         });
     }
-
 
     private void carregarDadosFormulario(String formId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -108,7 +102,15 @@ public class ViewResponses extends AppCompatActivity {
                                     List<String> respostas = (List<String>) doc.get("answers");
                                     respostasPorUsuario.add(respostas);
                                 }
-                                atualizarInterface();
+                                if (respostasPorUsuario.isEmpty()) {
+                                    Toast.makeText(this, "Formulario ainda não tem respostas", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(this, MyForms.class);
+                                    startActivity(intent);
+                                    finish();
+                                    // Não chama finish() conforme pedido
+                                } else {
+                                    atualizarInterface();
+                                }
                             })
                             .addOnFailureListener(e -> Toast.makeText(this, "Erro ao carregar respostas", Toast.LENGTH_SHORT).show());
                 })
@@ -116,12 +118,14 @@ public class ViewResponses extends AppCompatActivity {
     }
 
     private void mostrarPerguntas() {
+        // Seu método original não adicionava texto à UI, então não modifiquei
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < perguntas.size(); i++) {
             Map<String, Object> pergunta = perguntas.get(i);
             sb.append(i + 1).append(". ").append(pergunta.get("pergunta")).append("\n");
         }
-
+        // Se quiser exibir em um TextView, descomente e configure o TextView
+        // perguntasTextView.setText(sb.toString());
     }
 
     private void atualizarInterface() {
@@ -174,7 +178,6 @@ public class ViewResponses extends AppCompatActivity {
                         contagemNao.put(i, contagemNao.getOrDefault(i, 0) + 1);
                     }
                 } else if (tipo.equalsIgnoreCase("Múltipla Escolha")) {
-                    // Separar as respostas múltiplas por vírgula e contar individualmente
                     String[] opcoesSelecionadas = resposta.split(",\\s*");
                     for (String opcao : opcoesSelecionadas) {
                         contagemMultiplaEscolha.putIfAbsent(i, new HashMap<>());

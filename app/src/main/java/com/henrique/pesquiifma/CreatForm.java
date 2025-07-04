@@ -203,6 +203,16 @@ public class CreatForm extends AppCompatActivity {
                                     startActivity(intent);
                                 });
 
+                                Button buttonCopiarLink = findViewById(R.id.buttonCopiarLink);
+                                buttonCopiarLink.setVisibility(View.VISIBLE);
+                                buttonCopiarLink.setOnClickListener(v -> {
+                                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                                    android.content.ClipData clip = android.content.ClipData.newPlainText("Link do formulário", link);
+                                    clipboard.setPrimaryClip(clip);
+                                    Toast.makeText(this, "Link copiado para a área de transferência!", Toast.LENGTH_SHORT).show();
+                                });
+
+
                                 Toast.makeText(this, "Formulário salvo com sucesso!", Toast.LENGTH_SHORT).show();
                             })
                             .addOnFailureListener(e -> {
